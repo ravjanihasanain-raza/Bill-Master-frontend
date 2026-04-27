@@ -1315,7 +1315,7 @@ const handlePaymentNavigate = (invoice) => {
 
 ⚠ *Pending Since:* ${days} days
 
-🔗 *Pay Now:* https://yourapp.com/pay/${inv.id}
+
 
 👉 Kindly clear the pending amount to avoid delays.
 `;

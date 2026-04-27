@@ -37,14 +37,14 @@ export default function InvoicePreview() {
 
   const [company, setCompany] = useState({});
   const [client, setClient] = useState({});
-const [invoice, setInvoice] = useState(location.state?.invoice || null);
+  const [invoice, setInvoice] = useState(location.state?.invoice || null);
   const [items, setItems] = useState([]);
 
- useEffect(() => {
-  if (!invoice && location.state?.id) {
-    loadInvoice(location.state.id);
-  }
-}, []);
+  useEffect(() => {
+    if (!invoice && location.state?.id) {
+      loadInvoice(location.state.id);
+    }
+  }, []);
 
   const loadInvoice = async () => {
     try {
@@ -149,7 +149,7 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
   if (!invoice) return <h3 style={{ padding: 20 }}>Loading...</h3>;
 
   return (
-    <div style={{ background: "#f1f5f9", padding: 20 }}>
+    <div style={{ padding: 20 }}>
       <div
         id="invoice"
         style={{
@@ -161,41 +161,45 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
       >
         {" "}
         {/* HEADER */}
-        <div style={header}>
-          <img src={company.logoURL || ""} style={{ width: 70 }} />
-          <div style={{ textAlign: "center", flex: 1 }}>
-            <h2>{company.businessName}</h2>
+        <div
+          style={{
+            display: "flex",
+            padding: 15,
+            borderBottom: "2px solid #000",
+          }}
+        >
+          {/* LEFT */}
+          <div style={{ flex: 1 }}>
+            <h2 style={{ margin: 0 }}>{company.businessName}</h2>
             <p>{company.addressLine1}</p>
-            <p>
-              {company.contactNo} | {company.email}
-            </p>
-            <p>
-              GSTIN: {company.gstin} | PAN: {company.pan}
-            </p>
+            <p>{company.contactNo}</p>
+          </div>
+
+          {/* RIGHT */}
+          <div style={{ textAlign: "right" }}>
+            <h1 style={{ color: "#1d4ed8", fontSize: 36, margin: 0 }}>
+              INVOICE
+            </h1>
           </div>
         </div>
-        {/* TITLE */}
-        <div style={title}>
-          TAX INVOICE
-          <span style={{ float: "right", fontSize: 12 }}>
-            Original for Recipient
-          </span>
-        </div>
         {/* INFO */}
-        <div style={row}>
-          <div style={box} className="no-break">
+        <div style={{ display: "flex", ...section }}>
+          <div style={{ flex: 1, padding: 10, borderRight: "2px solid #000",lineHeight: "1.6" }}>
             <p>
-              <b>Invoice No:</b> {invoice.invoiceNo}
+              <b>Invoice#:</b> {invoice.invoiceNo}
             </p>
             <p>
-              <b>Date:</b> {new Date(invoice.invoiceDate).toLocaleDateString()}
+              <b>Date:</b> {invoice.invoiceDate}
             </p>
             <p>
-              <b>State:</b> {client.state}
+              <b>Terms:</b> Immediate
+            </p>
+            <p>
+              <b>Due:</b> {invoice.invoiceDate}
             </p>
           </div>
 
-          <div style={box} className="no-break">
+          <div style={{ flex: 1, padding: 10 }}>
             <p>
               <b>Place of Supply:</b> {client.state}
             </p>
@@ -211,8 +215,8 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
           </div>
         </div>
         {/* CLIENT */}
-        <div style={row}>
-          <div style={box} className="no-break">
+        <div style={{ display: "flex", borderBottom: "2px solid #000" }}>
+          <div style={{ flex: 1, padding: 10, borderRight: "2px solid #000" }}>
             <b>Receiver (Billed to)</b>
             <p>
               <b>Name:</b> {client.businessName}
@@ -237,7 +241,7 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
             </p>
           </div>
 
-          <div style={box} className="no-break">
+          <div style={{ flex: 1, padding: 10 }}>
             <b>Consignee (Shipped to)</b>
             <p>
               <b>Name:</b> {client.businessName}
@@ -259,7 +263,7 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
         {/* TABLE */}
         <table style={table}>
           <thead>
-            <tr style={{ background: "#f1f5f9" }}>
+            <tr style={{ background: "#1e3a8a", color: "#fff" }}>
               <th style={th}>Sr</th>
               <th style={th}>Product</th>
               <th style={th}>HSN</th>
@@ -291,7 +295,13 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
           </tbody>
         </table>
         {/* TOTAL */}
-        <div className="no-break" style={{ textAlign: "right", marginTop: 10 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+           <div style={{
+    width: 300,
+    border: "2px solid #000",
+    background: "#e0ecff",
+    padding: 15
+  }}>
           <p>
             Total Qty: {(items || []).reduce((a, i) => a + (i.qty || 0), 0)}
           </p>
@@ -299,6 +309,7 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
           <p>Total GST: ₹{invoice.gstAmount}</p>
           <h3 style={{ color: "#16a34a" }}>₹{invoice.total}</h3>
         </div>
+          </div>
         <p>
           <b>Amount in Words:</b> {numberToWords(invoice.total)}
         </p>
@@ -327,39 +338,37 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
           </div>
         </div>
         {/* FOOTER */}
-       {/* SIGNATURE + FOOTER */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginTop: 40,
-  }}
->
-  {/* Left Side */}
-  <div>
-    <p style={{ fontWeight: "600" }}>Thank you for your business</p>
-  </div>
+        {/* SIGNATURE + FOOTER */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginTop: 40,
+          }}
+        >
+          {/* Left Side */}
+          <div style={{ padding: 15, borderTop: "2px solid #000" }}>
+            <p >Thank you for your business</p>
+          </div>
 
-  {/* Right Side (Signature) */}
-  <div style={{ textAlign: "center" }}>
-    {company?.signatureURL && (
-      <img
-        src={company.signatureURL}
-        alt="Authorized Signature"
-        style={{
-          height: 80,
-          objectFit: "contain",
-          marginBottom: 5,
-        }}
-      />
-    )}
-    <p style={{ fontWeight: "600", margin: 0 }}>
-      Authorized Signatory
-    </p>
-    <p style={{ fontSize: 12 }}>{company.businessName}</p>
-  </div>
-</div>
+          {/* Right Side (Signature) */}
+          <div style={{ textAlign: "center" }}>
+            {company?.signatureURL && (
+              <img
+                src={company.signatureURL}
+                alt="Authorized Signature"
+                style={{
+                  height: 80,
+                  objectFit: "contain",
+                  marginBottom: 5,
+                }}
+              />
+            )}
+            <p style={{ fontWeight: "600", margin: 0 }}>Authorized Signatory</p>
+            <p style={{ fontSize: 12 }}>{company.businessName}</p>
+          </div>
+        </div>
       </div>
 
       {/* BUTTONS */}
@@ -385,28 +394,43 @@ const [invoice, setInvoice] = useState(location.state?.invoice || null);
       </div>
 
       {/* PRINT FIX */}
-      <style>{`
-        @media print {
-          body * { visibility: hidden; }
-          #invoice, #invoice * { visibility: visible; }
-        }
-      `}</style>
+    <div
+  id="invoice"
+  style={{
+    width: "210mm",
+    minHeight: "297mm",
+    background: "white",
+    border: "2px solid #000", // ✅ correct place
+    padding: "10mm"
+  }}
+></div>
     </div>
   );
 }
 
 /* STYLES */
-const th = { border: "1px solid #cbd5e1", padding: "6px", fontSize: "12px" };
-const td = { border: "1px solid #cbd5e1", padding: "6px", fontSize: "12px" };
+const th = {
+  border: "1px solid #000",
+  padding: "8px",
+  fontSize: "12px",
+};
+const section = {
+  borderBottom: "2px solid #000",
+  padding: 10
+};
+
+const td = {
+  border: "1px solid #000",
+  padding: "10px", // ⬅ increase from 8
+  fontSize: "12px",
+};
 
 const container = {
-  background: "#ffffff",
-  color: "#000000",
-  padding: 20,
-  borderRadius: 10,
-  maxWidth: "900px",
-  margin: "auto",
-  border: "1px solid #cbd5e1",
+  width: "210mm",
+  minHeight: "297mm",
+  padding: 0,
+  background: "#fff",
+  border: "2px solid #000", // 🔥 important
 };
 
 const header = {
@@ -434,10 +458,10 @@ const row = {
 
 const box = {
   flex: 1,
-  border: "1px solid #cbd5e1",
-  padding: 10,
-  borderRadius: 6,
-  background: "#f8fafc",
+  border: "2px solid #000",
+  padding: 12,
+  borderRadius: 0, // ❌ remove rounding
+  background: "#fff"
 };
 
 const table = {
