@@ -1,0 +1,52 @@
+{
+  "name": "abson-energy-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "apexcharts": "^5.10.5",
+    "axios": "^1.15.0",
+    "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.1",
+    "clsx": "^2.1.1",
+    "formik": "^2.4.9",
+    "framer-motion": "^12.38.0",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.14.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^1.7.0",
+    "react": "^19.1.1",
+    "react-apexcharts": "^2.1.0",
+    "react-chartjs-2": "^5.3.1",
+    "react-countup": "^6.5.3",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.13.1",
+    "recharts": "^3.8.1",
+    "styled-components": "^6.3.12",
+    "sweetalert2": "^11.26.21",
+    "sweetalert2-react-content": "^5.1.1",
+    "tailwind-merge": "^3.5.0",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.27",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^4.2.2",
+    "vite": "^7.1.2"
+  }
+}

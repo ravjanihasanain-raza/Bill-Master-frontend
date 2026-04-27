@@ -1,0 +1,254 @@
+/* =========================================================
+   ULTRA-PREMIUM STAFF PANEL - FUTURISTIC BLUE GLASS THEME
+   ========================================================= */
+
+/* --- Main Wrapper & Background --- */
+.staff-page {
+  min-height: 100vh;
+  /* Deep Dark Bluish Gradient with RGB Light Blobs */
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.12), transparent 40%),
+    linear-gradient(135deg, #020617 0%, #0B1221 100%);
+  color: #f8fafc;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 24px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* --- Premium Glass Cards --- */
+.staff-page .staff-card {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glowing top border shimmer effect */
+.staff-page .staff-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, #06b6d4, #3b82f6, transparent);
+  background-size: 200% auto;
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.staff-page .staff-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 
+    0 0 25px rgba(59, 130, 246, 0.25),
+    0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.staff-page .staff-card:hover::before {
+  opacity: 1;
+  animation: shimmerBorder 3s linear infinite;
+}
+
+@keyframes shimmerBorder {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* --- Futuristic Buttons (Glow Style) --- */
+.staff-page .staff-btn {
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+}
+
+.staff-page .staff-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+  filter: brightness(1.15);
+}
+
+.staff-page .staff-btn.danger { background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+.staff-page .staff-btn.success { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+.staff-page .staff-btn.secondary { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); color: #f8fafc !important; }
+
+/* --- Glowing Form Inputs --- */
+.staff-page .staff-form-group label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.staff-page .staff-input, .staff-page .staff-select {
+  width: 100%;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #f8fafc;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.staff-page .staff-input:focus, .staff-page .staff-select:focus {
+  background: rgba(15, 23, 42, 0.8);
+  border-color: #06b6d4;
+  box-shadow: 
+    0 0 15px rgba(6, 182, 212, 0.3),
+    inset 0 0 10px rgba(6, 182, 212, 0.1);
+  transform: scale(1.01);
+}
+
+/* --- Premium Staff Table --- */
+.staff-page .staff-table-wrapper {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+}
+
+.staff-page .staff-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.staff-page .staff-table th {
+  background: rgba(59, 130, 246, 0.12);
+  color: #38bdf8;
+  padding: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.staff-page .staff-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.3s;
+}
+
+.staff-page .staff-table tr:last-child td { border-bottom: none; }
+
+.staff-page .staff-table tr:hover td {
+  background: rgba(59, 130, 246, 0.08);
+  color: #fff;
+}
+
+/* --- Status Badges --- */
+.staff-page .badge-pill {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.staff-page .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.staff-page .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+/* --- Neon Visual Effects --- */
+.staff-page .neon-text-blue { color: #38bdf8; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+.staff-page .neon-text-green { color: #4ade80; text-shadow: 0 0 15px rgba(74, 222, 128, 0.5); }
+
+/* --- Animations --- */
+.staff-page .animate-up {
+  animation: staffSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes staffSlideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Responsive Scrollbar --- */
+.staff-page ::-webkit-scrollbar { width: 6px; height: 6px; }
+.staff-page ::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+.staff-page ::-webkit-scrollbar-track { background: transparent; }
+
+
+/* ADD THIS BELOW YOUR CSS */
+
+/* ===== FADE ANIMATION ===== */
+.staff-fade-in {
+  animation: fadeUp 0.6s ease forwards;
+  opacity: 0;
+}
+
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .staff-page {
+    padding: 14px;
+  }
+
+  .staff-card {
+    padding: 16px;
+  }
+
+  .staff-input {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .staff-table th,
+  .staff-table td {
+    padding: 10px;
+    font-size: 12px;
+  }
+}
+
+
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

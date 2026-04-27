@@ -1,0 +1,265 @@
+
+
+/* ================= GLOBAL RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ================= THEME VARIABLES (PREMIUM VERSION) ================= */
+:root {
+  --bg: #f4f7f9;
+  --card: #ffffff;
+  --text: #1e293b;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #0ea5e9;
+  
+  /* Additional UI Variables */
+  --text-muted: #64748b;
+  --bg-hover: #f8fafc;
+  --bg-light-custom: #f1f5f9;
+  --border-custom: #e2e8f0;
+}
+
+/* 🌙 DARK MODE (Fixed Visibility Issues) */
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f8fafc; 
+  --border: #334155;
+  --primary: #3b82f6;
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #38bdf8;
+  
+  /* Additional UI Variables for Dark Mode */
+  --text-muted: #94a3b8;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --bg-light-custom: rgba(15, 23, 42, 0.6);
+  --border-custom: rgba(255, 255, 255, 0.1);
+}
+
+/* ================= BODY ================= */
+body {
+  font-family: "Inter", "Poppins", sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.5;
+}
+
+#root {
+  width: 100%;
+}
+
+/* ================= UTILITIES ================= */
+.text-custom { color: var(--text) !important; }
+.text-muted-custom { color: var(--text-muted) !important; }
+.border-custom { border-color: var(--border-custom) !important; }
+
+/* Text colors for SweetAlert Icons */
+.text-danger { color: var(--danger) !important; }
+.text-success { color: var(--success) !important; }
+.text-warning { color: var(--warning) !important; }
+.text-info { color: var(--info) !important; }
+
+/* ================= CARD ================= */
+.card,
+.table-container {
+  background: var(--card);
+  border: 1px solid var(--border-custom);
+  border-radius: 12px;
+  padding: 15px;
+}
+
+/* ================= TABLE GLOBAL ================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  color: var(--text);
+}
+
+thead { background: var(--bg-light-custom); }
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-custom);
+}
+
+tr:hover td { background-color: var(--bg-hover); }
+
+/* ================= INPUTS & FORMS ================= */
+input, select {
+  cursor: pointer;
+  appearance: none; 
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 35px !important;
+}
+
+select option {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  padding: 10px;
+}
+
+[data-theme="dark"] select option {
+  background-color: #1e293b !important; 
+  color: #f8fafc !important;
+}
+
+/* ================= 🌟 FIXED BUTTONS (Action Buttons) ================= */
+.action-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 🌟 White text ONLY for primary/colored buttons */
+.action-btn.primary,
+.action-btn.success,
+.action-btn.danger,
+.action-btn.warning,
+.action-btn.info {
+  color: #ffffff !important; 
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Specific Button Colors */
+.action-btn.primary { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+.action-btn.success { background: linear-gradient(135deg, #22c55e, #16a34a) !important; }
+.action-btn.danger { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+.action-btn.warning { background: linear-gradient(135deg, #f59e0b, #d97706) !important; }
+.action-btn.info { background: linear-gradient(135deg, #0ea5e9, #0284c7) !important; }
+
+/* Secondary Button (Cancel) - Fixed White Text Issue */
+.action-btn.secondary { 
+  background: #64748b !important; /* Solid Gray background so it's always visible */
+  color: #ffffff !important;      /* White text */
+  border: none !important; 
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.2) !important;
+}
+
+.action-btn.secondary:hover {
+  background: #475569 !important; /* Thoda aur dark gray hover karne par */
+}
+.action-btn:active { transform: translateY(1px); }
+.action-btn:disabled { opacity: 0.5; pointer-events: none; filter: none; }
+
+/* 🌟 REMOVE all .glassy-swal-popup and transparent background CSS from your file */
+/* Only keep this basic SweetAlert Action alignment */
+.swal2-actions-custom {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+
+/* ================= MODAL GLOBAL ================= */
+.modal-bg {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(8px);
+  display: flex; justify-content: center; align-items: center; z-index: 9999;
+}
+
+.modal-box {
+  width: 520px; max-width: 90%; background: var(--card); color: var(--text);
+  border-radius: 16px; padding: 25px; border: 1px solid var(--border-custom);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+
+/* ================= 🌟 PREMIUM SWEETALERT2 (MINIMAL GLASSMORPHISM) ================= */
+/* 1. Background Overlay (Dark & Blurry) */
+.swal2-container.swal2-backdrop-show {
+  background: rgba(15, 23, 42, 0.6) !important; 
+  backdrop-filter: blur(12px) !important; 
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+/* 2. The Alert Box (Minimal Glass Look) */
+.glassy-swal-popup {
+  background: var(--card) !important; /* Adaptive Theme Card */
+  border: 1px solid var(--border-custom) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  padding: 30px !important;
+  font-family: "Poppins", "Inter", sans-serif !important;
+  color: var(--text) !important;
+  max-width: 400px !important; 
+}
+
+/* Dark Mode SweetAlert Shadow */
+[data-theme="dark"] .glassy-swal-popup {
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 3. SweetAlert Custom Actions Container */
+.swal2-actions-custom {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 15px !important;
+  margin-top: 25px !important;
+  width: 100% !important;
+}
+
+
+
+/* ================= SWEETALERT Z-INDEX FIX ================= */
+/* Ye alert ko form/modal ke upar dikhayega */
+.swal2-container {
+  z-index: 99999 !important;
+}
+
+
+
+@media print {
+
+  body {
+    margin: 0;
+  }
+
+  #invoice {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 10mm;
+    
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .no-break {
+    page-break-inside: avoid;
+  }
+
+  thead {
+  display: table-header-group;
+}
+}
