@@ -235,31 +235,60 @@ select option {
 
 @media print {
 
+  @page {
+    size: A4 portrait;
+    margin: 0mm !important;
+  }
+
+  html,
   body {
-    margin: 0;
-  }
-
-  #invoice {
     width: 210mm;
-    min-height: 297mm;
-    padding: 10mm;
-    
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
   }
 
-  table {
-    page-break-inside: auto;
+  body * {
+    visibility: hidden;
   }
 
-  tr {
-    page-break-inside: avoid;
-    page-break-after: auto;
+  #invoice-print-area,
+  #invoice-print-area * {
+    visibility: visible;
   }
 
-  .no-break {
-    page-break-inside: avoid;
+  #invoice-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 210mm !important;
+    height: 297mm !important;
+
+    margin: 0 !important;
+    padding: 10mm 12mm !important;
+
+    box-shadow: none !important;
+    overflow: hidden !important;
+
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+    page-break-inside: avoid !important;
   }
 
-  thead {
-  display: table-header-group;
-}
+  .hide-on-print {
+    display: none !important;
+  }
+
+  .preview-workspace {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  div[style*="transform: scale"] {
+    transform: scale(1) !important;
+  }
 }

@@ -29,7 +29,7 @@ export default function StaffSidebar({ open, setOpen }) {
             <LayoutDashboard size={20} />
             {open && <span>Dashboard</span>}
           </NavItem>
-          <NavItem to="/staff/invoice" onClick={handleMobileClose}>
+          <NavItem to="/staff/createinvoice" onClick={handleMobileClose}>
             <FileText size={20} />
             {open && <span>Invoices</span>}
           </NavItem>

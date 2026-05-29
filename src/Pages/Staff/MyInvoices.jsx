@@ -1202,7 +1202,9 @@ export default function MyInvoices() {
 
   const viewInvoice = (invoice) => {
     navigate("/staff/invoicepreview", {
-      state: { invoice },
+      state: {
+        id: invoice.id,
+      },
     });
   };
 
@@ -1225,24 +1227,21 @@ export default function MyInvoices() {
     visible: { y: 0, opacity: 1 },
   };
 
+  const handlePaymentNavigate = (invoice) => {
+    if (!invoice?.id) {
+      console.error("Invalid invoice for payment");
+      return;
+    }
 
-const handlePaymentNavigate = (invoice) => {
-  if (!invoice?.id) {
-    console.error("Invalid invoice for payment");
-    return;
-  }
-
-  navigate("/staff/payments", {
-    state: {
-      invoiceId: invoice.id,
-      invoiceData: invoice, // optional but useful
-    },
-  });
-};
+    navigate("/staff/payments", {
+      state: {
+        invoiceId: invoice.id,
+        invoiceData: invoice, // optional but useful
+      },
+    });
+  };
 
   const getCTA = (inv) => {
-
-    
     if (inv.pendingAmount === 0) {
       return {
         label: "Download Receipt",
@@ -2256,20 +2255,22 @@ const handlePaymentNavigate = (invoice) => {
                     </div>
                     {selectedInvoiceForDrawer?.pendingAmount > 0 && cta && (
                       <PremiumBtn
-  className="primary"
-  style={{ background: cta.color, flex: 1 }}
-  onClick={(e) => {
-    e.stopPropagation(); // 🔥 IMPORTANT (prevents drawer interference)
+                        className="primary"
+                        style={{ background: cta.color, flex: 1 }}
+                        onClick={(e) => {
+                          e.stopPropagation(); // 🔥 IMPORTANT (prevents drawer interference)
 
-    if (cta.action === "pay") {
-      handlePaymentNavigate(selectedInvoiceForDrawer);
-    } else {
-      window.open(`/receipt/${selectedInvoiceForDrawer.id}`);
-    }
-  }}
->
-  {cta.label}
-</PremiumBtn>
+                          if (cta.action === "pay") {
+                            handlePaymentNavigate(selectedInvoiceForDrawer);
+                          } else {
+                            window.open(
+                              `/receipt/${selectedInvoiceForDrawer.id}`,
+                            );
+                          }
+                        }}
+                      >
+                        {cta.label}
+                      </PremiumBtn>
                     )}{" "}
                   </div>
 

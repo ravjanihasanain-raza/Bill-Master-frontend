@@ -19,8 +19,10 @@ import InwardStock from "./Pages/admin/InwardStock.jsx";
 import OutwardEntry from "./Pages/admin/OutwardEntry.jsx";
 import AdminProfile from "./Pages/admin/AdminProfile.jsx";
 import AdminLogin from "./Pages/auth/Login.jsx";
-import purchasereport from "./Pages/admin/PurchaseReport.jsx"
+import purchasereport from "./Pages/admin/PurchaseReport.jsx";
 import SalesReport from "./Pages/admin/Salesreport.jsx";
+import ExpenseCategory from "./Pages/admin/ExpenseCategory.jsx";
+import ExpenseMaster from "./Pages/admin/Expense/ExpenseMaster.jsx";
 
 // ✅ LOADER (ONLY IMPORT, NO useContext OUTSIDE)
 import Loader from "./components/layouts/Loader.jsx";
@@ -40,27 +42,24 @@ import StaffHeader from "./components/layouts/StaffHeader.jsx";
 import StaffLogin from "./Pages/auth/Login.jsx";
 import StaffProfile from "./Pages/Staff/StaffProfile.jsx";
 import PurchaseReport from "./Pages/admin/PurchaseReport.jsx";
-
+import Invoice from "./Pages/Staff/Invoice/Invoice.jsx";
 
 
 // CONTEXT
 export const rootContext = createContext();
 
 export default function App() {
-
   const [loading, setLoading] = useState(false);
 
   return (
     <rootContext.Provider value={{ loading, setLoading }}>
-
       {/* ✅ GLOBAL LOADER */}
       {loading && <Loader />}
 
       <BrowserRouter>
-
         <Routes>
           {/* ================= ADMIN ================= */}
-          
+
           <Route path="AdminLogin" element={<AdminLogin />} />
           <Route path="/admin" element={<AbsonLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
@@ -78,34 +77,29 @@ export default function App() {
             <Route path="profile" element={<AdminProfile />} />
             <Route path="SalesReport" element={<SalesReport />} />
             <Route path="PurchaseReport" element={<PurchaseReport />} />
-            
-
+            <Route path="ExpenseCategory" element={<ExpenseCategory />} />
+            <Route path="Expenses" element={<ExpenseMaster />} />
           </Route>
 
           {/* ================= STAFF ================= */}
           <Route path="/staff/Login" element={<StaffLogin />}></Route>
           <Route path="/staff" element={<StaffLayout />}>
-          
-
             {/* DEFAULT STAFF REDIRECT */}
             <Route index element={<Navigate to="dashboard" />} />
 
             <Route path="dashboard" element={<StaffDashboard />} />
-            <Route path="invoice" element={<CreateInvoice />} />
-            <Route path="invoicepreview" element={<InvoicePreview />} />
+            <Route path="createinvoice" element={<CreateInvoice />} />
+            <Route path="invoicepreview" element={<Invoice />} />
             <Route path="myinvoices" element={<MyInvoices />} />
 
             <Route path="Payments" element={<Payments />} />
             <Route path="Customer" element={<Customer />} />
             <Route path="Products" element={<Products />} />
             <Route path="StaffProfile" element={<StaffProfile />} />
-            
 
             {/* OPTIONAL LOADER ROUTE */}
             <Route path="loader" element={<Loader />} />
             <Route path="StaffHeader" element={<StaffHeader />} />
-
-
           </Route>
 
           {/* 404 FALLBACK */}
@@ -113,11 +107,8 @@ export default function App() {
             path="*"
             element={<h4 style={{ padding: 20 }}>Page Not Found</h4>}
           />
-
         </Routes>
-
       </BrowserRouter>
-
     </rootContext.Provider>
   );
 }

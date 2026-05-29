@@ -15,30 +15,30 @@ export default function Header({
 
   const user = JSON.parse(localStorage.getItem("adminAuth") || "null");
   const userName = user?.name || "Admin";
-  useEffect(() => {
-    fetchLowStock();
+  // useEffect(() => {
+  //   fetchLowStock();
 
-    const interval = setInterval(() => {
-      fetchLowStock();
-    }, 30000);
+  //   const interval = setInterval(() => {
+  //     fetchLowStock();
+  //   }, 30000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
 
-  useEffect(() => {
-  window.addEventListener("stockUpdated", fetchLowStock);
+//   useEffect(() => {
+//   window.addEventListener("stockUpdated", fetchLowStock);
 
-  return () => {
-    window.removeEventListener("stockUpdated", fetchLowStock);
-  };
-}, []);
+//   return () => {
+//     window.removeEventListener("stockUpdated", fetchLowStock);
+//   };
+// }, []);
 
 
 
   const fetchLowStock = async () => {
     try {
-      const res = await fetch("https://localhost:xxxx/api/Stock/GetLowStock");
+      const res = await fetch("https://localhost:7116/api/Stock/GetLowStock");
       const data = await res.json();
 
       if (data.status === "OK") {

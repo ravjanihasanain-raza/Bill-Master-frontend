@@ -43,7 +43,7 @@ export default function StaffHeader({
         localStorage.removeItem("staffAuth");
 
         // 🔥 HARD RESET (IMPORTANT)
-        window.location.href = "/login";
+        navigate("/staff/Login");
       }
     });
   };
@@ -144,7 +144,7 @@ const staffName =
                   Logout
                 </MenuItem>
               ) : (
-                <MenuItem onClick={() => navigate("/Stafflogin")}>
+                <MenuItem onClick={() => navigate("/Staff/login")}>
                   Login
                 </MenuItem>
               )}

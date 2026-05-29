@@ -2,10 +2,33 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Package, RefreshCcw, AlertCircle, Calendar, Printer, 
-  Download, RotateCcw, Search, LayoutGrid, Percent, Filter, 
-  Plus, FileText, FileSpreadsheet, X, Layers, Hash, Archive, IndianRupee, PieChart, CheckCircle2, Edit3, Trash2, ChevronLeft, ChevronRight, PackageCheck
+import {
+  Package,
+  RefreshCcw,
+  AlertCircle,
+  Calendar,
+  Printer,
+  Download,
+  RotateCcw,
+  Search,
+  LayoutGrid,
+  Percent,
+  Filter,
+  Plus,
+  FileText,
+  FileSpreadsheet,
+  X,
+  Layers,
+  Hash,
+  Archive,
+  IndianRupee,
+  PieChart,
+  CheckCircle2,
+  Edit3,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  PackageCheck,
 } from "lucide-react";
 import CountUp from "react-countup";
 
@@ -111,7 +134,7 @@ export default function ProductMaster() {
       const fyRes = await getRequest("FinancialYear/List");
       if (fyRes.status === "OK" && fyRes.result) {
         const currentActiveFy = fyRes.result.find(
-          (y) => y.isActive && !y.isDelete
+          (y) => y.isActive && !y.isDelete,
         );
         setActiveFy(currentActiveFy || null);
       }
@@ -167,18 +190,18 @@ export default function ProductMaster() {
   // 🌟 Processing Data with ALL Filters
   const processedData = useMemo(() => {
     let result = [...products];
-    
+
     if (search) {
       result = result.filter(
         (p) =>
           p.name?.toLowerCase().includes(search.toLowerCase()) ||
           p.code?.toLowerCase().includes(search.toLowerCase()) ||
-          p.category?.toLowerCase().includes(search.toLowerCase())
+          p.category?.toLowerCase().includes(search.toLowerCase()),
       );
     }
     if (categoryFilter) {
       result = result.filter(
-        (p) => Number(p.productCategoryId) === Number(categoryFilter)
+        (p) => Number(p.productCategoryId) === Number(categoryFilter),
       );
     }
     if (minPrice) {
@@ -195,11 +218,11 @@ export default function ProductMaster() {
     }
     if (fromDate)
       result = result.filter(
-        (p) => new Date(p.createdAt || new Date()) >= new Date(fromDate)
+        (p) => new Date(p.createdAt || new Date()) >= new Date(fromDate),
       );
     if (toDate)
       result = result.filter(
-        (p) => new Date(p.createdAt || new Date()) <= new Date(toDate)
+        (p) => new Date(p.createdAt || new Date()) <= new Date(toDate),
       );
 
     if (sortOrder === "a-z")
@@ -208,14 +231,24 @@ export default function ProductMaster() {
       result.sort((a, b) => b.price - a.price);
     else if (sortOrder === "oldest")
       result.sort(
-        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)
+        (a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0),
       );
     else
       result.sort(
-        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
       );
     return result;
-  }, [products, search, fromDate, toDate, sortOrder, categoryFilter, minPrice, maxPrice, gstFilter]);
+  }, [
+    products,
+    search,
+    fromDate,
+    toDate,
+    sortOrder,
+    categoryFilter,
+    minPrice,
+    maxPrice,
+    gstFilter,
+  ]);
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -224,7 +257,16 @@ export default function ProductMaster() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, sortOrder, categoryFilter, fromDate, toDate, minPrice, maxPrice, gstFilter]);
+  }, [
+    search,
+    sortOrder,
+    categoryFilter,
+    fromDate,
+    toDate,
+    minPrice,
+    maxPrice,
+    gstFilter,
+  ]);
 
   // 🌟 Export Functions (Staff Product Style)
   const handleExportCSV = () => {
@@ -260,7 +302,7 @@ export default function ProductMaster() {
     link.setAttribute("href", encodedUri);
     link.setAttribute(
       "download",
-      `Product_Catalogue_${new Date().getTime()}.csv`
+      `Product_Catalogue_${new Date().getTime()}.csv`,
     );
     document.body.appendChild(link);
     link.click();
@@ -349,11 +391,11 @@ export default function ProductMaster() {
                   }</span></td>
                   <td style="font-weight: 600; color: #475569;">${p.unit}</td>
                   <td class="price">₹${Number(p.price).toLocaleString(
-                    "en-IN"
+                    "en-IN",
                   )}</td>
                   <td style="font-weight: 600; color: #475569;">${p.gst}%</td>
                 </tr>
-              `
+              `,
                 )
                 .join("")}
             </tbody>
@@ -389,7 +431,7 @@ export default function ProductMaster() {
     if (isFyLocked || !activeFy) {
       return warningAlert(
         "Financial Year Locked",
-        "Cannot modify products in closed or missing financial year."
+        "Cannot modify products in closed or missing financial year.",
       );
     }
     setProduct(emptyProduct);
@@ -400,7 +442,7 @@ export default function ProductMaster() {
     if (isFyLocked || !activeFy) {
       return warningAlert(
         "Financial Year Locked",
-        "Cannot modify products in closed or missing financial year."
+        "Cannot modify products in closed or missing financial year.",
       );
     }
     try {
@@ -428,12 +470,12 @@ export default function ProductMaster() {
     if (isFyLocked || !activeFy) {
       return warningAlert(
         "Financial Year Locked",
-        "Cannot modify products in closed or missing financial year."
+        "Cannot modify products in closed or missing financial year.",
       );
     }
     const confirm = await confirmAlert(
       "Delete Product?",
-      "This cannot be undone."
+      "This cannot be undone.",
     );
     if (!confirm.isConfirmed) return;
     try {
@@ -466,7 +508,7 @@ export default function ProductMaster() {
       if (res.status === "OK") {
         successAlert(
           "Success",
-          product.id > 0 ? "Product Updated" : "Product Added"
+          product.id > 0 ? "Product Updated" : "Product Added",
         );
         setShowModal(false);
         setProduct(emptyProduct);
@@ -483,9 +525,13 @@ export default function ProductMaster() {
 
   /* ===== DYNAMIC STATS ===== */
   const totalProducts = products.length;
-  const activeCategories = new Set(products.map((p) => p.productCategoryId)).size;
-  const totalCatalogCost = products.reduce((acc, p) => acc + (Number(p.costPrice) || 0), 0);
-  const gstEnabledCount = products.filter(p => Number(p.gst) > 0).length;
+  const activeCategories = new Set(products.map((p) => p.productCategoryId))
+    .size;
+  const totalCatalogCost = products.reduce(
+    (acc, p) => acc + (Number(p.costPrice) || 0),
+    0,
+  );
+  const gstEnabledCount = products.filter((p) => Number(p.gst) > 0).length;
 
   return (
     <>
@@ -497,16 +543,18 @@ export default function ProductMaster() {
               <PageTitle>
                 <Package className="title-icon" size={28} /> Product Catalog
               </PageTitle>
-              <p className="subtitle">Enterprise catalog & inventory management</p>
+              <p className="subtitle">
+                Enterprise catalog & inventory management
+              </p>
             </div>
-            
+
             <button
               className="btn-glow primary w-100 w-md-auto"
               onClick={handleAddClick}
               disabled={isFyLocked}
               style={{ opacity: isFyLocked ? 0.6 : 1 }}
             >
-              <Plus size={18} style={{ marginRight: '6px' }} /> Add Product
+              <Plus size={18} style={{ marginRight: "6px" }} /> Add Product
             </button>
           </HeaderSection>
 
@@ -539,7 +587,10 @@ export default function ProductMaster() {
                 <SummaryCard>
                   <div className="inner-content">
                     <div className="d-flex justify-content-between align-items-start mb-3">
-                      <span className="text-muted-custom fw-semibold text-uppercase tracking-wide" style={{ fontSize: "11px" }}>
+                      <span
+                        className="text-muted-custom fw-semibold text-uppercase tracking-wide"
+                        style={{ fontSize: "11px" }}
+                      >
                         Total Inventory
                       </span>
                       <div className="icon-box bg-primary-subtle text-primary">
@@ -558,11 +609,17 @@ export default function ProductMaster() {
                 <SummaryCard>
                   <div className="inner-content">
                     <div className="d-flex justify-content-between align-items-start mb-3">
-                      <span className="text-muted-custom fw-semibold text-uppercase tracking-wide" style={{ fontSize: "11px" }}>
+                      <span
+                        className="text-muted-custom fw-semibold text-uppercase tracking-wide"
+                        style={{ fontSize: "11px" }}
+                      >
                         Total Catalog Cost
                       </span>
                       <div className="icon-box bg-warning-subtle text-warning">
-                        <i className="fas fa-rupee-sign" style={{ fontSize: "18px" }}></i>
+                        <i
+                          className="fas fa-rupee-sign"
+                          style={{ fontSize: "18px" }}
+                        ></i>
                       </div>
                     </div>
                     <h3 className="fw-bold mt-2 text-custom mb-0">
@@ -577,7 +634,10 @@ export default function ProductMaster() {
                 <SummaryCard>
                   <div className="inner-content">
                     <div className="d-flex justify-content-between align-items-start mb-3">
-                      <span className="text-muted-custom fw-semibold text-uppercase tracking-wide" style={{ fontSize: "11px" }}>
+                      <span
+                        className="text-muted-custom fw-semibold text-uppercase tracking-wide"
+                        style={{ fontSize: "11px" }}
+                      >
                         GST Enabled
                       </span>
                       <div className="icon-box bg-danger-subtle text-danger">
@@ -604,7 +664,12 @@ export default function ProductMaster() {
                       <small>Print filtered view</small>
                     </div>
                   </div>
-                  <button className="btn-action-small" disabled={initialLoad || loading || processedData.length === 0}>
+                  <button
+                    className="btn-action-small"
+                    disabled={
+                      initialLoad || loading || processedData.length === 0
+                    }
+                  >
                     Print
                   </button>
                 </ActionCard>
@@ -619,7 +684,12 @@ export default function ProductMaster() {
                       <small>Download excel data</small>
                     </div>
                   </div>
-                  <button className="btn-action-small" disabled={initialLoad || loading || processedData.length === 0}>
+                  <button
+                    className="btn-action-small"
+                    disabled={
+                      initialLoad || loading || processedData.length === 0
+                    }
+                  >
                     Export
                   </button>
                 </ActionCard>
@@ -627,14 +697,20 @@ export default function ProductMaster() {
                 <ActionCard onClick={handleRefresh}>
                   <div className="left-content">
                     <div className="icon-wrapper bg-info-subtle text-info">
-                      <RefreshCcw size={20} className={isRefreshing ? "spin" : ""} />
+                      <RefreshCcw
+                        size={20}
+                        className={isRefreshing ? "spin" : ""}
+                      />
                     </div>
                     <div className="text-content">
                       <h6>Sync Data</h6>
                       <small>Refresh inventory</small>
                     </div>
                   </div>
-                  <button className="btn-action-small" disabled={initialLoad || loading || isRefreshing}>
+                  <button
+                    className="btn-action-small"
+                    disabled={initialLoad || loading || isRefreshing}
+                  >
                     Sync
                   </button>
                 </ActionCard>
@@ -669,7 +745,10 @@ export default function ProductMaster() {
                 </select>
               </div>
               <div className="filter-item">
-                <i className="fas fa-rupee-sign icon" style={{ fontSize: '13px' }}></i>
+                <i
+                  className="fas fa-rupee-sign icon"
+                  style={{ fontSize: "13px" }}
+                ></i>
                 <input
                   type="number"
                   placeholder="Min Price"
@@ -678,7 +757,10 @@ export default function ProductMaster() {
                 />
               </div>
               <div className="filter-item">
-                <i className="fas fa-rupee-sign icon" style={{ fontSize: '13px' }}></i>
+                <i
+                  className="fas fa-rupee-sign icon"
+                  style={{ fontSize: "13px" }}
+                ></i>
                 <input
                   type="number"
                   placeholder="Max Price"
@@ -740,7 +822,9 @@ export default function ProductMaster() {
                     <th>Category</th>
                     <th>Price / Cost</th>
                     <th>Taxes (GST)</th>
-                    <th className="no-print" style={{ textAlign: "center" }}>Actions</th>
+                    <th className="no-print" style={{ textAlign: "center" }}>
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -748,7 +832,10 @@ export default function ProductMaster() {
                     <SkeletonTableRows rows={itemsPerPage} columns={5} />
                   ) : currentRecords.length === 0 ? (
                     <tr>
-                      <td colSpan="5" style={{ padding: "3rem 0", borderBottom: "none" }}>
+                      <td
+                        colSpan="5"
+                        style={{ padding: "3rem 0", borderBottom: "none" }}
+                      >
                         <PremiumEmptyState
                           icon={Package}
                           title="No Products Found"
@@ -765,7 +852,9 @@ export default function ProductMaster() {
                               <i className="fas fa-box"></i>
                             </div>
                             <div>
-                              <div className="fw-bolder text-custom fs-6">{p.name}</div>
+                              <div className="fw-bolder text-custom fs-6">
+                                {p.name}
+                              </div>
                               <small className="text-muted-custom fw-medium">
                                 Code: {p.code || "N/A"}
                               </small>
@@ -789,7 +878,9 @@ export default function ProductMaster() {
                         </td>
                         <td>
                           <div className="d-flex flex-column">
-                            <span className="text-custom fw-bold">{p.gst}%</span>
+                            <span className="text-custom fw-bold">
+                              {p.gst}%
+                            </span>
                             <span className="text-muted-custom small fw-medium">
                               HSN: {p.hsn || "-"}
                             </span>
@@ -801,7 +892,9 @@ export default function ProductMaster() {
                               className="edit"
                               onClick={() => handleEditClick(p.id)}
                               disabled={isFyLocked}
-                              title={isFyLocked ? "Locked in active FY" : "Edit"}
+                              title={
+                                isFyLocked ? "Locked in active FY" : "Edit"
+                              }
                             >
                               <i className="fas fa-pen"></i>
                             </button>
@@ -810,7 +903,9 @@ export default function ProductMaster() {
                               className="delete"
                               onClick={() => handleDeleteClick(p.id)}
                               disabled={isFyLocked}
-                              title={isFyLocked ? "Locked in active FY" : "Delete"}
+                              title={
+                                isFyLocked ? "Locked in active FY" : "Delete"
+                              }
                             >
                               <i className="fas fa-trash-alt"></i>
                             </button>
@@ -824,34 +919,36 @@ export default function ProductMaster() {
             </TableWrapper>
 
             {/* 🌟 Pagination Logic */}
-            {!loading && !initialLoad && processedData.length > itemsPerPage && (
-              <PaginationWrapper className="mt-4 pt-3 border-top border-custom no-print">
-                <span className="text-muted-custom small fw-medium">
-                  Showing <b>{indexOfFirst + 1}</b> to{" "}
-                  <b>{Math.min(indexOfLast, processedData.length)}</b> of{" "}
-                  <b>{processedData.length}</b> entries
-                </span>
-                <div className="d-flex gap-2">
-                  <button
-                    className="action-btn-page"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage((c) => c - 1)}
-                  >
-                    <i className="fas fa-chevron-left me-1"></i> Prev
-                  </button>
-                  <span className="page-indicator">
-                    {currentPage} / {totalPages || 1}
+            {!loading &&
+              !initialLoad &&
+              processedData.length > itemsPerPage && (
+                <PaginationWrapper className="mt-4 pt-3 border-top border-custom no-print">
+                  <span className="text-muted-custom small fw-medium">
+                    Showing <b>{indexOfFirst + 1}</b> to{" "}
+                    <b>{Math.min(indexOfLast, processedData.length)}</b> of{" "}
+                    <b>{processedData.length}</b> entries
                   </span>
-                  <button
-                    className="action-btn-page"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((c) => c + 1)}
-                  >
-                    Next <i className="fas fa-chevron-right ms-1"></i>
-                  </button>
-                </div>
-              </PaginationWrapper>
-            )}
+                  <div className="d-flex gap-2">
+                    <button
+                      className="action-btn-page"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((c) => c - 1)}
+                    >
+                      <i className="fas fa-chevron-left me-1"></i> Prev
+                    </button>
+                    <span className="page-indicator">
+                      {currentPage} / {totalPages || 1}
+                    </span>
+                    <button
+                      className="action-btn-page"
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage((c) => c + 1)}
+                    >
+                      Next <i className="fas fa-chevron-right ms-1"></i>
+                    </button>
+                  </div>
+                </PaginationWrapper>
+              )}
           </GlassCard>
 
           {/* 🎭 MODAL (Premium Layout) */}
@@ -902,29 +999,60 @@ export default function ProductMaster() {
                     <div className="row g-4">
                       <div className="col-md-6">
                         <FormGroup>
-                          <label>Product Name <span className="text-danger">*</span></label>
-                          <FormInput name="name" value={product.name} onChange={handleChange} placeholder="Product Name" disabled={submitLoading} autoFocus />
+                          <label>
+                            Product Name <span className="text-danger">*</span>
+                          </label>
+                          <FormInput
+                            name="name"
+                            value={product.name}
+                            onChange={handleChange}
+                            placeholder="Product Name"
+                            disabled={submitLoading}
+                            autoFocus
+                          />
                         </FormGroup>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
                           <label>Product Code</label>
-                          <FormInput name="code" value={product.code} onChange={handleChange} placeholder="Product Code" disabled={submitLoading} />
+                          <FormInput
+                            name="code"
+                            value={product.code}
+                            onChange={handleChange}
+                            placeholder="Product Code"
+                            disabled={submitLoading}
+                          />
                         </FormGroup>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
-                          <label>Category <span className="text-danger">*</span></label>
-                          <FormSelect name="productCategoryId" value={product.productCategoryId} onChange={handleChange} disabled={submitLoading}>
+                          <label>
+                            Category <span className="text-danger">*</span>
+                          </label>
+                          <FormSelect
+                            name="productCategoryId"
+                            value={product.productCategoryId}
+                            onChange={handleChange}
+                            disabled={submitLoading}
+                          >
                             <option value="">Select Category</option>
-                            {categories.map((c) => (<option key={c.id} value={c.id}>{c.categoryName}</option>))}
+                            {categories.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.categoryName}
+                              </option>
+                            ))}
                           </FormSelect>
                         </FormGroup>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
                           <label>Measurement Unit</label>
-                          <FormSelect name="unit" value={product.unit} onChange={handleChange} disabled={submitLoading}>
+                          <FormSelect
+                            name="unit"
+                            value={product.unit}
+                            onChange={handleChange}
+                            disabled={submitLoading}
+                          >
                             <option value="NOS">NOS (Numbers)</option>
                             <option value="PCS">PCS (Pieces)</option>
                             <option value="KG">KG</option>
@@ -935,14 +1063,47 @@ export default function ProductMaster() {
                         </FormGroup>
                       </div>
                       <div className="col-12 mt-2">
-                        <h6 className="text-primary border-bottom border-custom pb-2 fw-bold text-uppercase" style={{fontSize: "12px", letterSpacing: "0.5px"}}><i className="fas fa-tags me-2"></i>Pricing & Taxes</h6>
+                        <h6
+                          className="text-primary border-bottom border-custom pb-2 fw-bold text-uppercase"
+                          style={{ fontSize: "12px", letterSpacing: "0.5px" }}
+                        >
+                          <i className="fas fa-tags me-2"></i>Pricing & Taxes
+                        </h6>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
-                          <label>Selling Price (MRP) <span className="text-danger">*</span></label>
+                          <label>
+                            Selling Price (MRP){" "}
+                            <span className="text-danger">*</span>
+                          </label>
                           <div className="currency-input d-flex">
-                            <span className="currency-symbol" style={{background: 'var(--bg-light-custom)', border: '1px solid var(--border-custom)', borderRight: 'none', padding: '14px 18px', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', color: 'var(--text-muted)', fontWeight: 'bold'}}>₹</span>
-                            <FormInput type="number" name="price" value={product.price} onChange={handleChange} placeholder="e.g., 2500" style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} disabled={submitLoading} />
+                            <span
+                              className="currency-symbol"
+                              style={{
+                                background: "var(--bg-light-custom)",
+                                border: "1px solid var(--border-custom)",
+                                borderRight: "none",
+                                padding: "14px 18px",
+                                borderTopLeftRadius: "12px",
+                                borderBottomLeftRadius: "12px",
+                                color: "var(--text-muted)",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ₹
+                            </span>
+                            <FormInput
+                              type="number"
+                              name="price"
+                              value={product.price}
+                              onChange={handleChange}
+                              placeholder="e.g., 2500"
+                              style={{
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0,
+                              }}
+                              disabled={submitLoading}
+                            />
                           </div>
                         </FormGroup>
                       </div>
@@ -950,21 +1111,59 @@ export default function ProductMaster() {
                         <FormGroup>
                           <label>Cost Price (Purchase Rate)</label>
                           <div className="currency-input d-flex">
-                            <span className="currency-symbol" style={{background: 'var(--bg-light-custom)', border: '1px solid var(--border-custom)', borderRight: 'none', padding: '14px 18px', borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', color: 'var(--text-muted)', fontWeight: 'bold'}}>₹</span>
-                            <FormInput type="number" name="costPrice" value={product.costPrice} onChange={handleChange} placeholder="e.g., 2100" style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} disabled={submitLoading} />
+                            <span
+                              className="currency-symbol"
+                              style={{
+                                background: "var(--bg-light-custom)",
+                                border: "1px solid var(--border-custom)",
+                                borderRight: "none",
+                                padding: "14px 18px",
+                                borderTopLeftRadius: "12px",
+                                borderBottomLeftRadius: "12px",
+                                color: "var(--text-muted)",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ₹
+                            </span>
+                            <FormInput
+                              type="number"
+                              name="costPrice"
+                              value={product.costPrice}
+                              onChange={handleChange}
+                              placeholder="e.g., 2100"
+                              style={{
+                                borderTopLeftRadius: 0,
+                                borderBottomLeftRadius: 0,
+                              }}
+                              disabled={submitLoading}
+                            />
                           </div>
                         </FormGroup>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
                           <label>GST (%)</label>
-                          <FormInput type="number" name="gst" value={product.gst} onChange={handleChange} placeholder="e.g., 18" disabled={submitLoading} />
+                          <FormInput
+                            type="number"
+                            name="gst"
+                            value={product.gst}
+                            onChange={handleChange}
+                            placeholder="e.g., 18"
+                            disabled={submitLoading}
+                          />
                         </FormGroup>
                       </div>
                       <div className="col-md-6">
                         <FormGroup>
                           <label>HSN / SAC Code</label>
-                          <FormInput name="hsn" value={product.hsn} onChange={handleChange} placeholder="e.g., 854140" disabled={submitLoading} />
+                          <FormInput
+                            name="hsn"
+                            value={product.hsn}
+                            onChange={handleChange}
+                            placeholder="e.g., 854140"
+                            disabled={submitLoading}
+                          />
                         </FormGroup>
                       </div>
                     </div>
@@ -990,7 +1189,11 @@ export default function ProductMaster() {
                       ) : (
                         <i className="fas fa-check me-2"></i>
                       )}
-                      {submitLoading ? "Saving..." : product.id > 0 ? "Update" : "Save"}
+                      {submitLoading
+                        ? "Saving..."
+                        : product.id > 0
+                          ? "Update"
+                          : "Save"}
                     </button>
                   </ModalFooter>
                 </ModalContent>
@@ -1018,29 +1221,57 @@ export default function ProductMaster() {
                     <div className="icon-circle mx-auto mb-3">
                       <Download size={32} color="#3b82f6" />
                     </div>
-                    <h4 className="fw-bold mb-2 text-custom">Choose Export Format</h4>
-                    <p className="text-muted-custom small mb-4">Select how you want to export the currently filtered product catalogue.</p>
+                    <h4 className="fw-bold mb-2 text-custom">
+                      Choose Export Format
+                    </h4>
+                    <p className="text-muted-custom small mb-4">
+                      Select how you want to export the currently filtered
+                      product catalogue.
+                    </p>
                     <div className="d-flex gap-3">
-                      <PremiumBtn 
-                        className="secondary" 
-                        style={{ flex: 1, height: "60px", flexDirection: 'column', gap: '5px' }} 
+                      <PremiumBtn
+                        className="secondary"
+                        style={{
+                          flex: 1,
+                          height: "60px",
+                          flexDirection: "column",
+                          gap: "5px",
+                        }}
                         onClick={handleExportPDF}
                         disabled={loading || processedData.length === 0}
                       >
-                        <FileText size={20} color="#3b82f6" /> <span style={{fontSize: '11px'}}>HTML / PDF</span>
+                        <FileText size={20} color="#3b82f6" />{" "}
+                        <span style={{ fontSize: "11px" }}>HTML / PDF</span>
                       </PremiumBtn>
-                      <PremiumBtn 
-                        className="secondary" 
-                        style={{ flex: 1, height: "60px", flexDirection: 'column', gap: '5px' }} 
+                      <PremiumBtn
+                        className="secondary"
+                        style={{
+                          flex: 1,
+                          height: "60px",
+                          flexDirection: "column",
+                          gap: "5px",
+                        }}
                         onClick={handleExportCSV}
                         disabled={loading || processedData.length === 0}
                       >
-                        <FileSpreadsheet size={20} color="#10b981" /> <span style={{fontSize: '11px'}}>CSV Data</span>
+                        <FileSpreadsheet size={20} color="#10b981" />{" "}
+                        <span style={{ fontSize: "11px" }}>CSV Data</span>
                       </PremiumBtn>
                     </div>
                   </div>
-                  <ModalFooter style={{ justifyContent: "center", background: "transparent", borderTop: "none", padding: "0 24px 24px" }}>
-                    <PremiumBtn className="danger-outline" onClick={() => setShowExportModal(false)} style={{ width: "100%" }}>
+                  <ModalFooter
+                    style={{
+                      justifyContent: "center",
+                      background: "transparent",
+                      borderTop: "none",
+                      padding: "0 24px 24px",
+                    }}
+                  >
+                    <PremiumBtn
+                      className="danger-outline"
+                      onClick={() => setShowExportModal(false)}
+                      style={{ width: "100%" }}
+                    >
                       Cancel
                     </PremiumBtn>
                   </ModalFooter>
@@ -1048,7 +1279,6 @@ export default function ProductMaster() {
               </ModalOverlay>
             )}
           </AnimatePresence>
-
         </PageWrapper>
       </PageTransition>
 
@@ -1110,7 +1340,7 @@ const HeaderSection = styled.div`
       margin: 4px 0 0 0;
     }
   }
-  
+
   .btn-glow {
     padding: 10px 20px;
     border: none;
@@ -1122,13 +1352,13 @@ const HeaderSection = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.primary {
       background: linear-gradient(135deg, #3b82f6, #06b6d4);
       color: white;
       box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
     }
-    
+
     &:hover:not(:disabled) {
       transform: translateY(-2px);
       filter: brightness(1.1);
@@ -1190,7 +1420,7 @@ const FyBadge = styled.div`
 const ActionAndStatGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  
+
   gap: 16px;
 `;
 
@@ -1208,13 +1438,13 @@ const SummaryCard = styled.div`
     background: transparent;
     border-radius: 15px;
   }
-  
+
   &:hover {
     transform: translateY(-4px) scale(1.01);
     box-shadow: 0 12px 30px rgba(59, 130, 246, 0.1);
     border-color: rgba(59, 130, 246, 0.3);
   }
-  
+
   .icon-box {
     width: 44px;
     height: 44px;
@@ -1225,7 +1455,7 @@ const SummaryCard = styled.div`
     font-size: 18px;
     transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   &:hover .icon-box {
     transform: scale(1.1) rotate(5deg);
   }
@@ -1271,8 +1501,20 @@ const ActionCard = styled.div`
     .text-content {
       display: flex;
       flex-direction: column;
-      h6 { margin: 0; font-size: 14px; font-weight: 800; color: var(--text); letter-spacing: 0.3px; }
-      small { margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+      h6 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: 0.3px;
+      }
+      small {
+        margin: 0;
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
     }
   }
 
@@ -1294,7 +1536,7 @@ const ActionCard = styled.div`
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
       transform: translateY(-2px);
     }
-    
+
     &:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -1307,7 +1549,10 @@ const GlassCard = styled.div`
   border: 1px solid var(--border-custom);
   border-radius: 20px;
   box-shadow: 0 4px 6px rgba(13, 51, 236, 0.81);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease;
 
   &:hover {
     box-shadow: 0 16px 40px rgba(59, 130, 246, 0.05);
@@ -1322,12 +1567,17 @@ const CompactFilterBar = styled.div`
   padding: 12px;
   border-radius: 12px;
   border: 1px solid var(--border-custom);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
   overflow-x: auto;
   white-space: nowrap;
 
-  &::-webkit-scrollbar { height: 4px; }
-  &::-webkit-scrollbar-thumb { background: var(--border-custom); border-radius: 10px; }
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-custom);
+    border-radius: 10px;
+  }
 
   @media (max-width: 992px) {
     flex-wrap: wrap;
@@ -1355,7 +1605,8 @@ const CompactFilterBar = styled.div`
       margin-right: 8px;
     }
 
-    input, select {
+    input,
+    select {
       border: none;
       background: transparent;
       color: var(--text);
@@ -1414,7 +1665,7 @@ const TableWrapper = styled.div`
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  
+
   th {
     padding: 16px;
     text-align: left;
@@ -1426,7 +1677,7 @@ const Table = styled.table`
     background: var(--bg-light-custom);
     border-bottom: 1px solid var(--border-custom);
   }
-  
+
   td {
     padding: 16px;
     vertical-align: middle;
@@ -1444,7 +1695,7 @@ const Table = styled.table`
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(59, 130, 246, 0.05);
   }
-  
+
   tr.list-row:hover td {
     border-color: rgba(59, 130, 246, 0.2);
   }
@@ -1508,8 +1759,12 @@ const ActionButtons = styled.div`
     justify-content: center;
     background: var(--bg-light-custom);
 
-    &.edit { color: #0ea5e9; }
-    &.delete { color: #ef4444; }
+    &.edit {
+      color: #0ea5e9;
+    }
+    &.delete {
+      color: #ef4444;
+    }
 
     &:disabled {
       opacity: 0.5;
@@ -1522,7 +1777,7 @@ const ActionButtons = styled.div`
       color: white;
       box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
     }
-    
+
     &:hover:not(:disabled).delete {
       transform: translateY(-3px);
       background: #ef4444;
@@ -1536,12 +1791,12 @@ const PaginationWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
+
   .action-btn-page {
     padding: 8px 16px;
     border-radius: 8px;
     border: 1px solid var(--border-custom);
-      box-shadow: 0 4px 6px rgba(13, 51, 236, 0.81);
+    box-shadow: 0 4px 6px rgba(13, 51, 236, 0.81);
 
     background: var(--card);
     color: var(--text);
@@ -1551,12 +1806,12 @@ const PaginationWrapper = styled.div`
     display: flex;
     align-items: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
-    
+
     &:hover:not(:disabled) {
       background: linear-gradient(135deg, #3b82f6, #06b6d4);
       color: white;
@@ -1593,7 +1848,9 @@ const ModalContent = styled(motion.div)`
   max-width: 800px;
   border-radius: 20px;
   border: 1px solid var(--border-custom);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.15);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(59, 130, 246, 0.15);
   overflow: hidden;
 `;
 
@@ -1604,12 +1861,15 @@ const SmallExportModal = styled(motion.div)`
   border-radius: 20px;
   border: 1px solid var(--border-custom);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  
+
   .icon-circle {
-    width: 64px; height: 64px;
+    width: 64px;
+    height: 64px;
     background: rgba(59, 130, 246, 0.1);
     border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -1620,7 +1880,7 @@ const ModalHeader = styled.div`
   align-items: center;
   background: var(--bg-light-custom);
   border-bottom: 1px solid var(--border-custom);
-  
+
   .icon-box-sm {
     width: 40px;
     height: 40px;
@@ -1643,7 +1903,7 @@ const ModalHeader = styled.div`
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    
+
     &:hover:not(:disabled) {
       background: var(--danger);
       color: white;
@@ -1658,7 +1918,7 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  
+
   label {
     font-size: 12px;
     font-weight: 700;
@@ -1679,16 +1939,16 @@ const FormInput = styled.input`
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
-  
+
   &::placeholder {
     color: var(--text-muted);
     opacity: 0.6;
   }
-  
+
   &:hover:not(:disabled) {
     border-color: rgba(59, 130, 246, 0.5);
   }
-  
+
   &:focus:not(:disabled) {
     background: var(--card);
     border-color: var(--primary);
@@ -1712,11 +1972,11 @@ const FormSelect = styled.select`
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s ease;
-  
+
   &:hover:not(:disabled) {
     border-color: rgba(59, 130, 246, 0.5);
   }
-  
+
   &:focus:not(:disabled) {
     background: var(--card);
     border-color: var(--primary);
@@ -1749,26 +2009,26 @@ const ModalFooter = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    
+
     &.danger {
       background: transparent;
       color: #ef4444;
       border: 1px solid #ef4444;
     }
-    
+
     &.danger:hover:not(:disabled) {
       background: #ef4444;
       color: white;
       box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
       transform: translateY(-2px);
     }
-    
+
     &.success {
       background: linear-gradient(135deg, #10b981, #059669);
       color: white;
       box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
     }
-    
+
     &.success:hover:not(:disabled) {
       filter: brightness(1.1);
       box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
@@ -1792,7 +2052,7 @@ const PremiumBtn = styled.button`
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
-  
+
   border: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1802,7 +2062,7 @@ const PremiumBtn = styled.button`
     background: var(--card);
     color: var(--text);
     border: 1px solid var(--border-custom);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     &:hover:not(:disabled) {
       transform: translateY(-2px);
       border-color: var(--primary);

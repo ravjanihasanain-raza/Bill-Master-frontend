@@ -111,6 +111,8 @@ export default function SoftwareSettings() {
         logoURL: logoPreview,
         signatureURL: signaturePreview,
       };
+
+      console.log(payload);
       const res = await postRequest("SoftwareSettings/Save", payload);
       if (res.status === "OK") {
         Swal.fire({
@@ -128,6 +130,7 @@ export default function SoftwareSettings() {
         setIsSaved(true);
       }
     } catch (err) {
+      console.log(err.response?.data);
       Swal.fire({
         icon: "error",
         title: "Error",

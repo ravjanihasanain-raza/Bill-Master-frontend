@@ -125,6 +125,22 @@ export default function Sidebar({ open, closeSidebar }) {
                 </NavItem>
               )}
             </StyledLink>
+            <StyledLink to="/admin/expensecategory" onClick={closeSidebar}>
+              {({ isActive }) => (
+                <NavItem $active={isActive} $isSub>
+                  <i className="fas fa-tag"></i>
+                  {open && <span>Expense Category</span>}
+                </NavItem>
+              )}
+            </StyledLink>
+            <StyledLink to="/admin/expensemaster" onClick={closeSidebar}>
+              {({ isActive }) => (
+                <NavItem $active={isActive} $isSub>
+                  <i className="fas fa-tag"></i>
+                  {open && <span>ExpenseMaster</span>}
+                </NavItem>
+              )}
+            </StyledLink>
           </SubMenu>
         )}
 

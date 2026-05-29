@@ -422,20 +422,23 @@ export default function CreateInvoice() {
   const [remarks, setRemarks] = useState("");
   const [totals, setTotals] = useState({ gross: 0, gst: 0, grand: 0 });
 
-  const [historyData, setHistoryData] = useState([]);
-const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [poNumber, setPoNumber] = useState("");
+  const [poDate, setPoDate] = useState("");
 
-const viewHistory = async (productId) => {
-  try {
-    const res = await getRequest(`Stock/History/${productId}`);
-    if (res.status === "OK") {
-      setHistoryData(res.result);
-      setShowHistoryModal(true);
+  const [historyData, setHistoryData] = useState([]);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+  const viewHistory = async (productId) => {
+    try {
+      const res = await getRequest(`Stock/History/${productId}`);
+      if (res.status === "OK") {
+        setHistoryData(res.result);
+        setShowHistoryModal(true);
+      }
+    } catch (err) {
+      alert("Failed to load history");
     }
-  } catch (err) {
-    alert("Failed to load history");
-  }
-};
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -637,6 +640,8 @@ const viewHistory = async (productId) => {
           grossAmount: Number(totals.gross),
           gstAmount: Number(totals.gst),
           staffMasterId: Number(staffId),
+          poNumber: poNumber,
+          poDate: poDate || null,
         },
         items: items.map((i) => ({
           productMasterId: i.productId,
@@ -909,6 +914,28 @@ const viewHistory = async (productId) => {
                           value={nextInvoiceNo}
                           disabled
                           style={{ color: "var(--primary)", fontWeight: 800 }}
+                        />
+                      </div>
+                    </InputGroup>
+                    <InputGroup>
+                      <label>PO Number</label>
+                      <div className="input-wrapper">
+                        <input
+                          type="text"
+                          placeholder="Enter PO Number"
+                          value={poNumber}
+                          onChange={(e) => setPoNumber(e.target.value)}
+                        />
+                      </div>
+                    </InputGroup>
+
+                    <InputGroup>
+                      <label>PO Date</label>
+                      <div className="input-wrapper">
+                        <input
+                          type="date"
+                          value={poDate}
+                          onChange={(e) => setPoDate(e.target.value)}
                         />
                       </div>
                     </InputGroup>
@@ -1498,48 +1525,47 @@ const viewHistory = async (productId) => {
         }
       `}</style>
 
-
       {showHistoryModal && (
-  <div style={{
-    position: "fixed",
-    top: "10%",
-    left: "50%",
-    transform: "translateX(-50%)",
-    background: "white",
-    padding: "20px",
-    borderRadius: "10px",
-    zIndex: 1000,
-    width: "400px"
-  }}>
-    <h3>Stock History</h3>
+        <div
+          style={{
+            position: "fixed",
+            top: "10%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "white",
+            padding: "20px",
+            borderRadius: "10px",
+            zIndex: 1000,
+            width: "400px",
+          }}
+        >
+          <h3>Stock History</h3>
 
-    <table style={{ width: "100%" }}>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Qty</th>
-        </tr>
-      </thead>
+          <table style={{ width: "100%" }}>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Qty</th>
+              </tr>
+            </thead>
 
-      <tbody>
-        {historyData.map((h, i) => (
-          <tr key={i}>
-            <td>{new Date(h.date).toLocaleDateString()}</td>
-            <td style={{ color: h.type === "IN" ? "green" : "red" }}>
-              {h.type}
-            </td>
-            <td>{h.qty}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            <tbody>
+              {historyData.map((h, i) => (
+                <tr key={i}>
+                  <td>{new Date(h.date).toLocaleDateString()}</td>
+                  <td style={{ color: h.type === "IN" ? "green" : "red" }}>
+                    {h.type}
+                  </td>
+                  <td>{h.qty}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-    <button onClick={() => setShowHistoryModal(false)}>
-      Close
-    </button>
-  </div>
-)}
+          <button onClick={() => setShowHistoryModal(false)}>Close</button>
+        </div>
+      )}
     </PageWrapper>
   );
 }

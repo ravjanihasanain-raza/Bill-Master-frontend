@@ -1,6 +1,28 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import styled, { keyframes, css } from "styled-components";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  CalendarDays,
+  RefreshCcw,
+  CalendarCheck,
+  Lock,
+  Database,
+  Search,
+  Filter,
+  Plus,
+  RotateCcw,
+  CheckCircle2,
+  X,
+  Edit3,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  BarChart3,
+  CalendarClock,
+} from "lucide-react";
+
 import {
   getRequest,
   postRequest,
@@ -16,7 +38,16 @@ import {
 } from "../../../Services/sweetAlert";
 
 import GlobalLoader from "../../components/common/GlobalLoader.jsx";
+import PageTransition from "../../components/common/PageTransition.jsx";
+import PremiumEmptyState from "../../components/common/PremiumEmptyState.jsx";
+import {
+  SkeletonCard,
+  SkeletonTableRows,
+} from "../../components/common/SkeletonLoader.jsx";
 
+/* ─────────────────────────────────────────────
+   ANIMATED NUMBER COUNTER
+───────────────────────────────────────────── */
 const AnimatedNumber = ({ value, prefix = "", isCurrency = false }) => {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -51,6 +82,9 @@ const AnimatedNumber = ({ value, prefix = "", isCurrency = false }) => {
   );
 };
 
+/* ═══════════════════════════════════════════════════════════
+   MAIN COMPONENT
+═══════════════════════════════════════════════════════════ */
 export default function FinancialYear() {
   const emptyForm = {
     id: 0,
@@ -59,6 +93,7 @@ export default function FinancialYear() {
     endDate: "",
   };
 
+  /* ── Master States ── */
   const [years, setYears] = useState([]);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -67,21 +102,32 @@ export default function FinancialYear() {
   const [form, setForm] = useState(emptyForm);
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  /* ── Filters ── */
   const [sortOrder, setSortOrder] = useState("newest");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
+  /* ── Pagination ── */
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  /* ── Premium Enhancement States ── */
+  const [initialLoad, setInitialLoad] = useState(true);
+
   useEffect(() => {
-    fetchYears();
+    fetchInitialData();
   }, []);
+
+  const fetchInitialData = async () => {
+    setInitialLoad(true);
+    await fetchYears(false);
+    setTimeout(() => setInitialLoad(false), 700);
+  };
 
   const fetchYears = async (preservePage = false) => {
     try {
-      setLoading(true);
+      if (!initialLoad) setLoading(true);
       const res = await getRequest("FinancialYear/List");
       if (res.status === "OK") {
         setYears(res.result || []);
@@ -90,7 +136,7 @@ export default function FinancialYear() {
     } catch (err) {
       errorAlert("Error", "Failed to fetch financial years");
     } finally {
-      setTimeout(() => setLoading(false), 400);
+      if (!initialLoad) setTimeout(() => setLoading(false), 400);
     }
   };
 
@@ -288,828 +334,1112 @@ export default function FinancialYear() {
     (y) => new Date(y.startDate) > new Date() && !y.isClosed,
   ).length;
 
+  const activeFiltersCount =
+    [search, fromDate, toDate].filter(Boolean).length +
+    (statusFilter !== "ALL" ? 1 : 0);
+
+  /* ════════════════════════════════════════════════════════
+     RENDER
+  ════════════════════════════════════════════════════════ */
   return (
     <>
-      <GlobalLoader isLoading={loading || submitLoading} />
-      <PageWrapper className="p-2 p-md-4">
-        <HeaderSection className="mb-4 fade-slide-up delay-1 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3">
-          <div className="title-area">
-            <h2 className="fw-bold m-0 gradient-text">Financial Year</h2>
-            <small className="text-muted-custom d-flex align-items-center gap-2 mt-1">
-              <BreadcrumbLink to="/admin/dashboard">
-                <i className="fas fa-home me-1"></i> Home
-              </BreadcrumbLink>
-              <i
-                className="fas fa-chevron-right"
-                style={{ fontSize: "10px" }}
-              ></i>
-              <span>Settings</span>
-              <i
-                className="fas fa-chevron-right"
-                style={{ fontSize: "10px" }}
-              ></i>
-              <span className="text-primary fw-medium">Financial Year</span>
-            </small>
-          </div>
-          <button
-            className="btn-glow primary w-100 w-md-auto"
-            onClick={() => {
-              setForm(emptyForm);
-              setShowModal(true);
-            }}
-            disabled={loading}
+      <GlobalLoader isLoading={initialLoad || submitLoading} />
+      <PageTransition>
+        <PageShell>
+          {/* ─── PREMIUM PAGE HEADER ─── */}
+          <PageHeader
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <i className="fas fa-calendar-plus me-2"></i> Add Year
-          </button>
-        </HeaderSection>
+            <HeaderLeft>
+              <ModuleIcon>
+                <CalendarDays size={22} />
+              </ModuleIcon>
+              <HeaderText>
+                <PageTitle>Financial Year</PageTitle>
+                <Breadcrumb>
+                  <BreadcrumbLink to="/admin/dashboard">Home</BreadcrumbLink>
+                  <BreadSep>/</BreadSep>
+                  <BreadcrumbLink to="#">Settings</BreadcrumbLink>
+                  <BreadSep>/</BreadSep>
+                  <BreadActive>Financial Year</BreadActive>
+                </Breadcrumb>
+              </HeaderText>
+            </HeaderLeft>
 
-        <SummaryGrid className="mb-4 fade-slide-up delay-2">
-          <SummaryCard>
-            <div className="inner-content">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <span
-                  className="text-muted-custom fw-semibold text-uppercase tracking-wide"
-                  style={{ fontSize: "11px" }}
-                >
-                  Total Records
-                </span>
-                <div className="icon-box bg-primary-subtle text-primary">
-                  <i className="fas fa-database summary-icon"></i>
-                </div>
-              </div>
-              <h3 className="fw-bold mt-2 text-custom mb-0">
-                <AnimatedNumber value={totalYears} />
-              </h3>
-              <small className="text-muted-custom mt-2 d-block">
-                Financial Years in System
-              </small>
-            </div>
-          </SummaryCard>
-
-          <SummaryCard>
-            <div className="inner-content">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <span
-                  className="text-muted-custom fw-semibold text-uppercase tracking-wide"
-                  style={{ fontSize: "11px" }}
-                >
-                  Active Year
-                </span>
-                <div className="icon-box bg-success-subtle text-success">
-                  <i className="fas fa-calendar-check summary-icon"></i>
-                </div>
-              </div>
-              <h3
-                className="fw-bold mt-2 text-custom mb-0"
-                style={{ fontSize: "1.5rem" }}
+            <HeaderRight>
+              <HeaderBtn
+                variant="ghost"
+                onClick={() => fetchYears(true)}
+                disabled={loading || initialLoad}
               >
-                {activeYearData ? activeYearData.yearName : "None"}
-              </h3>
-              <small className="text-success mt-2 d-block">
-                Currently generating invoices
-              </small>
-            </div>
-          </SummaryCard>
-
-          <SummaryCard>
-            <div className="inner-content">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <span
-                  className="text-muted-custom fw-semibold text-uppercase tracking-wide"
-                  style={{ fontSize: "11px" }}
-                >
-                  Closed Years
-                </span>
-                <div className="icon-box bg-danger-subtle text-danger">
-                  <i className="fas fa-lock summary-icon"></i>
-                </div>
-              </div>
-              <h3 className="fw-bold mt-2 text-custom mb-0">
-                <AnimatedNumber value={closedCount} />
-              </h3>
-              <small className="text-danger mt-2 d-block">
-                Locked for modifications
-              </small>
-            </div>
-          </SummaryCard>
-
-          <SummaryCard>
-            <div className="inner-content">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <span
-                  className="text-muted-custom fw-semibold text-uppercase tracking-wide"
-                  style={{ fontSize: "11px" }}
-                >
-                  Upcoming Years
-                </span>
-                <div
-                  className="icon-box bg-info-subtle text-info"
-                  style={{ color: "#0ea5e9" }}
-                >
-                  <i className="fas fa-hourglass-half summary-icon"></i>
-                </div>
-              </div>
-              <h3 className="fw-bold mt-2 text-custom mb-0">
-                <AnimatedNumber value={upcomingCount} />
-              </h3>
-              <small
-                className="text-info mt-2 d-block"
-                style={{ color: "#0ea5e9" }}
-              >
-                Scheduled for future
-              </small>
-            </div>
-          </SummaryCard>
-        </SummaryGrid>
-
-        <FilterCard className="fade-slide-up delay-3">
-          <SearchWrapper>
-            <i className="fas fa-search icon"></i>
-            <input
-              type="text"
-              placeholder="Search year name..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setCurrentPage(1);
-              }}
-              disabled={loading}
-            />
-          </SearchWrapper>
-
-          <FilterGroup>
-            <QuickPill
-              $active={statusFilter === "ACTIVE"}
-              onClick={() => {
-                setStatusFilter("ACTIVE");
-                setCurrentPage(1);
-              }}
-              disabled={loading}
-            >
-              Active Only
-            </QuickPill>
-            <QuickPill
-              $active={statusFilter === "CLOSED"}
-              onClick={() => {
-                setStatusFilter("CLOSED");
-                setCurrentPage(1);
-              }}
-              disabled={loading}
-            >
-              Closed Only
-            </QuickPill>
-
-            <div className="filter-input">
-              <i className="fas fa-filter text-muted-custom me-2"></i>
-              <select
-                value={statusFilter}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value);
-                  setCurrentPage(1);
+                <RefreshCcw size={15} className={loading ? "spin" : ""} />
+                {loading ? "Syncing…" : "Refresh"}
+              </HeaderBtn>
+              <HeaderBtn
+                variant="primary"
+                onClick={() => {
+                  setForm(emptyForm);
+                  setShowModal(true);
                 }}
                 disabled={loading}
               >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active</option>
-                <option value="CLOSED">Closed</option>
-                <option value="UPCOMING">Upcoming</option>
-                <option value="INACTIVE">Inactive</option>
-              </select>
-            </div>
+                <Plus size={15} />
+                New Financial Year
+              </HeaderBtn>
+            </HeaderRight>
+          </PageHeader>
 
-            <div className="filter-input">
-              <i className="fas fa-sort-amount-down text-muted-custom me-2"></i>
-              <select
-                value={sortOrder}
-                onChange={(e) => {
-                  setSortOrder(e.target.value);
-                  setCurrentPage(1);
-                }}
-                disabled={loading}
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="a-z">Name (A-Z)</option>
-              </select>
-            </div>
+          {/* ─── KPI SUMMARY DASHBOARD ─── */}
+          <KpiGrid
+            as={motion.div}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            $columns={4}
+          >
+            {initialLoad ? (
+              [0, 1, 2, 3].map((i) => <KpiSkeleton key={i} />)
+            ) : (
+              <>
+                <KpiCard $accent="#3b82f6">
+                  <KpiIconWrap $color="#3b82f6">
+                    <Database size={24} />
+                  </KpiIconWrap>
+                  <KpiBody>
+                    <KpiLabel>Total Records</KpiLabel>
+                    <KpiValue>
+                      <AnimatedNumber value={totalYears} />
+                    </KpiValue>
+                    <KpiSub>Financial Years in System</KpiSub>
+                  </KpiBody>
+                  <KpiGlow $color="#3b82f6" />
+                </KpiCard>
+                <KpiCard $accent="#10b981">
+                  <KpiIconWrap $color="#10b981">
+                    <CalendarCheck size={24} />
+                  </KpiIconWrap>
+                  <KpiBody>
+                    <KpiLabel>Active Year</KpiLabel>
+                    <KpiValue style={{ fontSize: "1.4rem" }}>
+                      {activeYearData ? activeYearData.yearName : "None"}
+                    </KpiValue>
+                    <KpiSub style={{ color: "#10b981" }}>Currently generating invoices</KpiSub>
+                  </KpiBody>
+                  <KpiGlow $color="#10b981" />
+                </KpiCard>
+                <KpiCard $accent="#ef4444">
+                  <KpiIconWrap $color="#ef4444">
+                    <Lock size={24} />
+                  </KpiIconWrap>
+                  <KpiBody>
+                    <KpiLabel>Closed Years</KpiLabel>
+                    <KpiValue>
+                      <AnimatedNumber value={closedCount} />
+                    </KpiValue>
+                    <KpiSub style={{ color: "#ef4444" }}>Locked for modifications</KpiSub>
+                  </KpiBody>
+                  <KpiGlow $color="#ef4444" />
+                </KpiCard>
+                <KpiCard $accent="#0ea5e9">
+                  <KpiIconWrap $color="#0ea5e9">
+                    <CalendarClock size={24} />
+                  </KpiIconWrap>
+                  <KpiBody>
+                    <KpiLabel>Upcoming Years</KpiLabel>
+                    <KpiValue>
+                      <AnimatedNumber value={upcomingCount} />
+                    </KpiValue>
+                    <KpiSub style={{ color: "#0ea5e9" }}>Scheduled for future</KpiSub>
+                  </KpiBody>
+                  <KpiGlow $color="#0ea5e9" />
+                </KpiCard>
+              </>
+            )}
+          </KpiGrid>
 
-            <div className="filter-input">
-              <i className="fas fa-calendar-alt text-muted-custom me-2"></i>
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => {
-                  setFromDate(e.target.value);
-                  setCurrentPage(1);
-                }}
-                disabled={loading}
-              />
-              <span className="mx-2 text-muted-custom">-</span>
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => {
-                  setToDate(e.target.value);
-                  setCurrentPage(1);
-                }}
-                disabled={loading}
-              />
-            </div>
-
-            <button
-              className="action-btn secondary px-3 py-2"
-              onClick={resetFilters}
-              disabled={loading}
-              style={{ borderRadius: "14px", height: "40px" }}
-            >
-              <i className="fas fa-undo"></i>
-            </button>
-          </FilterGroup>
-        </FilterCard>
-
-        <GlassCard className="p-0 overflow-hidden fade-slide-up delay-3 mt-4">
-          <TableWrapper>
-            <Table>
-              <thead>
-                <tr>
-                  <th>Financial Year</th>
-                  <th>Duration (Start - End)</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: "center" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentRecords.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan="4"
-                      className="text-center py-5 border-0 text-muted-custom"
-                    >
-                      <i className="fas fa-calendar-times fs-1 mb-3 opacity-50"></i>
-                      <br />
-                      No financial years found matching criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  currentRecords.map((y, i) => {
-                    const status = getStatus(y);
-                    return (
-                      <tr
-                        key={y.id}
-                        className="fade-in list-row"
-                        style={{ animationDelay: `${i * 0.05}s` }}
-                      >
-                        <td>
-                          <div className="product-info">
-                            <div className="avatar-circle">
-                              <i className="fas fa-calendar-alt"></i>
-                            </div>
-                            <div className="fw-bold text-custom">
-                              {y.yearName}
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="d-flex flex-column gap-1">
-                            <span className="text-success fw-medium">
-                              Start:{" "}
-                              {y.startDate
-                                ? new Date(y.startDate).toLocaleDateString()
-                                : "-"}
-                            </span>
-                            <span className="text-danger small">
-                              End:{" "}
-                              {y.endDate
-                                ? new Date(y.endDate).toLocaleDateString()
-                                : "-"}
-                            </span>
-                          </div>
-                        </td>
-                        <td>
-                          <StatusBadge $status={status}>{status}</StatusBadge>
-                        </td>
-                        <td>
-                          <ActionButtons>
-                            {status !== "ACTIVE" && status !== "CLOSED" ? (
-                              <button
-                                className="success"
-                                onClick={() => handleSetActive(y.id)}
-                                title="Set Active"
-                                disabled={loading}
-                              >
-                                <i className="fas fa-check-circle"></i>
-                              </button>
-                            ) : (
-                              <button
-                                className="success disabled-action"
-                                disabled
-                                title={
-                                  status === "CLOSED"
-                                    ? "Year is closed"
-                                    : "Currently Active"
-                                }
-                              >
-                                <i className="fas fa-check-circle"></i>
-                              </button>
-                            )}
-
-                            {status !== "CLOSED" ? (
-                              <button
-                                className="danger"
-                                onClick={() => handleCloseYear(y.id)}
-                                title="Lock / Close Year"
-                                disabled={loading}
-                              >
-                                <i className="fas fa-lock"></i>
-                              </button>
-                            ) : (
-                              <button
-                                className="danger disabled-action"
-                                disabled
-                                title="Already Locked"
-                              >
-                                <i className="fas fa-lock"></i>
-                              </button>
-                            )}
-
-                            <button
-                              className="info"
-                              onClick={() => handleViewReport(y.id)}
-                              title="View Report"
-                              disabled={loading}
-                            >
-                              <i className="fas fa-chart-bar"></i>
-                            </button>
-                            <button
-                              className="secondary"
-                              onClick={() => handleBackupData(y.id)}
-                              title="Backup Data"
-                              disabled={loading}
-                            >
-                              <i className="fas fa-database"></i>
-                            </button>
-
-                            <div className="action-divider"></div>
-
-                            {status !== "CLOSED" ? (
-                              <>
-                                <button
-                                  className="edit"
-                                  onClick={() => handleEdit(y.id)}
-                                  title="Edit"
-                                  disabled={loading}
-                                >
-                                  <i className="fas fa-pen"></i>
-                                </button>
-                                <button
-                                  className="delete"
-                                  onClick={() => handleDelete(y.id)}
-                                  title="Delete"
-                                  disabled={loading}
-                                >
-                                  <i className="fas fa-trash-alt"></i>
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  className="edit disabled-action"
-                                  disabled
-                                  title="Locked"
-                                >
-                                  <i className="fas fa-lock"></i>
-                                </button>
-                                <button
-                                  className="delete disabled-action"
-                                  disabled
-                                  title="Locked"
-                                >
-                                  <i className="fas fa-lock"></i>
-                                </button>
-                              </>
-                            )}
-                          </ActionButtons>
-                        </td>
-                      </tr>
-                    );
-                  })
+          {/* ─── MAIN TABLE CARD ─── */}
+          <TableCard
+            as={motion.div}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            {/* FILTER BAR */}
+            <FilterBar>
+              <FilterField $grow={2}>
+                <Search size={14} className="fi" />
+                <input
+                  type="text"
+                  placeholder="Search year name..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                {search && (
+                  <ClearBtn onClick={() => setSearch("")}>
+                    <X size={12} />
+                  </ClearBtn>
                 )}
-              </tbody>
-            </Table>
-          </TableWrapper>
+              </FilterField>
 
-          {processedData.length > itemsPerPage && (
-            <PaginationWrapper className="p-4 border-top border-custom bg-light-custom">
-              <span className="text-muted-custom small fw-medium">
-                Showing {indexOfFirst + 1} to{" "}
-                {Math.min(indexOfLast, processedData.length)} of{" "}
-                {processedData.length} entries
-              </span>
-              <div className="d-flex gap-2">
-                <button
-                  className="action-btn secondary"
-                  disabled={currentPage === 1 || loading}
-                  onClick={() => setCurrentPage((c) => c - 1)}
+              <FilterField>
+                <Filter size={14} className="fi" />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
                 >
-                  <i className="fas fa-chevron-left me-1"></i> Prev
-                </button>
-                <span className="text-custom fw-bold px-3 py-1 bg-card rounded-pill border border-custom d-flex align-items-center">
-                  {currentPage} / {totalPages || 1}
-                </span>
-                <button
-                  className="action-btn secondary"
-                  disabled={currentPage === totalPages || loading}
-                  onClick={() => setCurrentPage((c) => c + 1)}
-                >
-                  Next <i className="fas fa-chevron-right ms-1"></i>
-                </button>
-              </div>
-            </PaginationWrapper>
-          )}
-        </GlassCard>
+                  <option value="ALL">All Status</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="CLOSED">Closed</option>
+                  <option value="UPCOMING">Upcoming</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+              </FilterField>
 
-        {showModal && (
-          <ModalOverlay
-            onClick={() => {
-              setShowModal(false);
-              setForm(emptyForm);
-            }}
-          >
-            <ModalContent
-              onClick={(e) => e.stopPropagation()}
-              className="glowing-modal"
-            >
-              <ModalHeader>
-                <h5 className="fw-bold mb-0 text-custom d-flex align-items-center gap-2">
-                  <div className="icon-box-sm bg-primary-subtle text-primary">
-                    <i className="fas fa-calendar-alt"></i>
-                  </div>
-                  {form.id > 0 ? "Edit Financial Year" : "Add Financial Year"}
-                </h5>
-                <button
-                  className="close-btn"
-                  onClick={() => {
+              <FilterField>
+                <Filter size={14} className="fi" />
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="a-z">Name (A→Z)</option>
+                </select>
+              </FilterField>
+
+              <FilterField $date>
+                <span className="lbl">From</span>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                />
+              </FilterField>
+
+              <FilterField $date>
+                <span className="lbl">To</span>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                />
+              </FilterField>
+
+              <ResetBtn onClick={resetFilters}>
+                <RotateCcw size={13} />
+                Reset
+                {activeFiltersCount > 0 && (
+                  <FilterBadge>{activeFiltersCount}</FilterBadge>
+                )}
+              </ResetBtn>
+            </FilterBar>
+
+            {/* DATA GRID */}
+            <DataGridWrap>
+              <DataGrid>
+                <thead>
+                  <tr>
+                    <Th>Financial Year</Th>
+                    <Th>Duration (Start - End)</Th>
+                    <Th center>Status</Th>
+                    <Th center>Actions</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {initialLoad || loading ? (
+                    <SkeletonTableRows rows={itemsPerPage} columns={4} />
+                  ) : currentRecords.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="4"
+                        style={{ padding: "4rem 0", borderBottom: "none" }}
+                      >
+                        <PremiumEmptyState
+                          icon={<CalendarDays size={40} strokeWidth={1.2} />}
+                          title="No Financial Years Found"
+                          subtitle="No financial years match your search or filters."
+                        />
+                      </td>
+                    </tr>
+                  ) : (
+                    currentRecords.map((y, i) => {
+                      const status = getStatus(y);
+                      return (
+                        <DataRow
+                          key={y.id}
+                          as={motion.tr}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.04 }}
+                        >
+                          <Td>
+                            <ProfileCell>
+                              <Avatar>
+                                <CalendarDays size={16} />
+                              </Avatar>
+                              <div>
+                                <div className="fw-bolder">{y.yearName}</div>
+                                <span className="sub">
+                                  System Registry
+                                </span>
+                              </div>
+                            </ProfileCell>
+                          </Td>
+                          <Td>
+                            <DetailsCell>
+                              <span style={{ color: "#10b981", fontWeight: "600" }}>
+                                Start: {y.startDate ? new Date(y.startDate).toLocaleDateString() : "-"}
+                              </span>
+                              <span style={{ color: "#ef4444", fontWeight: "600" }}>
+                                End: {y.endDate ? new Date(y.endDate).toLocaleDateString() : "-"}
+                              </span>
+                            </DetailsCell>
+                          </Td>
+                          <Td center>
+                            <StatusBadge $status={status}>{status}</StatusBadge>
+                          </Td>
+                          <Td center>
+                            <ActionsGroup>
+                              {/* Set Active Button */}
+                              {status !== "ACTIVE" && status !== "CLOSED" ? (
+                                <ActionBtn
+                                  $type="success"
+                                  onClick={() => handleSetActive(y.id)}
+                                  title="Set Active"
+                                  disabled={loading}
+                                >
+                                  <CheckCircle2 size={14} />
+                                </ActionBtn>
+                              ) : (
+                                <ActionBtn
+                                  $type="success"
+                                  disabled
+                                  title={status === "CLOSED" ? "Year is closed" : "Currently Active"}
+                                >
+                                  <CheckCircle2 size={14} />
+                                </ActionBtn>
+                              )}
+
+                              {/* Close/Lock Button */}
+                              {status !== "CLOSED" ? (
+                                <ActionBtn
+                                  $type="danger"
+                                  onClick={() => handleCloseYear(y.id)}
+                                  title="Lock / Close Year"
+                                  disabled={loading}
+                                >
+                                  <Lock size={14} />
+                                </ActionBtn>
+                              ) : (
+                                <ActionBtn $type="danger" disabled title="Already Locked">
+                                  <Lock size={14} />
+                                </ActionBtn>
+                              )}
+
+                              {/* Report & Backup Buttons */}
+                              <ActionBtn
+                                $type="info"
+                                onClick={() => handleViewReport(y.id)}
+                                title="View Report"
+                                disabled={loading}
+                              >
+                                <BarChart3 size={14} />
+                              </ActionBtn>
+                              <ActionBtn
+                                $type="secondary"
+                                onClick={() => handleBackupData(y.id)}
+                                title="Backup Data"
+                                disabled={loading}
+                              >
+                                <Database size={14} />
+                              </ActionBtn>
+
+                              <div className="action-divider"></div>
+
+                              {/* Edit & Delete Buttons */}
+                              {status !== "CLOSED" ? (
+                                <>
+                                  <ActionBtn
+                                    $type="edit"
+                                    onClick={() => handleEdit(y.id)}
+                                    title="Edit"
+                                    disabled={loading}
+                                  >
+                                    <Edit3 size={14} />
+                                  </ActionBtn>
+                                  <ActionBtn
+                                    $type="delete"
+                                    onClick={() => handleDelete(y.id)}
+                                    title="Delete"
+                                    disabled={loading}
+                                  >
+                                    <Trash2 size={14} />
+                                  </ActionBtn>
+                                </>
+                              ) : (
+                                <>
+                                  <ActionBtn $type="edit" disabled title="Locked">
+                                    <Lock size={14} />
+                                  </ActionBtn>
+                                  <ActionBtn $type="delete" disabled title="Locked">
+                                    <Lock size={14} />
+                                  </ActionBtn>
+                                </>
+                              )}
+                            </ActionsGroup>
+                          </Td>
+                        </DataRow>
+                      );
+                    })
+                  )}
+                </tbody>
+              </DataGrid>
+            </DataGridWrap>
+
+            {/* PAGINATION */}
+            {!loading && !initialLoad && processedData.length > itemsPerPage && (
+              <PaginationRow>
+                <PaginationInfo>
+                  Showing{" "}
+                  <strong>
+                    {indexOfFirst + 1}–{Math.min(indexOfLast, processedData.length)}
+                  </strong>{" "}
+                  of <strong>{processedData.length}</strong>
+                </PaginationInfo>
+                <PaginationControls>
+                  <PageBtn
+                    onClick={() => setCurrentPage((c) => c - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft size={15} /> Prev
+                  </PageBtn>
+                  <PageIndicator>
+                    {currentPage} / {totalPages || 1}
+                  </PageIndicator>
+                  <PageBtn
+                    onClick={() => setCurrentPage((c) => c + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next <ChevronRight size={15} />
+                  </PageBtn>
+                </PaginationControls>
+              </PaginationRow>
+            )}
+          </TableCard>
+
+          {/* ════════════════════════════════════════════════
+              ADD / EDIT MODAL
+          ════════════════════════════════════════════════ */}
+          <AnimatePresence>
+            {showModal && (
+              <Overlay
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => {
+                  if (!submitLoading) {
                     setShowModal(false);
                     setForm(emptyForm);
-                  }}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              </ModalHeader>
-              <div
-                className="modal-body p-4 custom-scrollbar"
-                style={{ maxHeight: "65vh", overflowY: "auto" }}
+                  }
+                }}
               >
-                <div className="row g-3">
-                  <div className="col-12">
+                <ModalBox
+                  style={{ maxWidth: "540px" }}
+                  initial={{ scale: 0.94, y: 24, opacity: 0 }}
+                  animate={{ scale: 1, y: 0, opacity: 1 }}
+                  exit={{ scale: 0.94, y: 24, opacity: 0 }}
+                  transition={{ type: "spring", damping: 26, stiffness: 320 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ModalHead>
+                    <ModalIconWrap $color="#3b82f6">
+                      <CalendarDays size={18} />
+                    </ModalIconWrap>
+                    <ModalTitle>
+                      {form.id > 0 ? "Edit Financial Year" : "Add Financial Year"}
+                    </ModalTitle>
+                    <CloseBtn
+                      onClick={() => {
+                        if (!submitLoading) {
+                          setShowModal(false);
+                          setForm(emptyForm);
+                        }
+                      }}
+                      disabled={submitLoading}
+                    >
+                      <X size={18} />
+                    </CloseBtn>
+                  </ModalHead>
+
+                  <ModalBody>
                     <FormGroup>
-                      <label>
-                        Year Name <span className="text-danger">*</span>
-                      </label>
+                      <FormLabel>
+                        Year Name <Required>*</Required>
+                      </FormLabel>
                       <FormInput
                         name="yearName"
                         value={form.yearName}
                         onChange={handleChange}
                         placeholder="e.g. 2025-2026"
                         autoFocus
+                        disabled={submitLoading}
                       />
                     </FormGroup>
-                  </div>
-                  <div className="col-md-6">
-                    <FormGroup>
-                      <label>
-                        Start Date <span className="text-danger">*</span>
-                      </label>
-                      <FormInput
-                        type="date"
-                        name="startDate"
-                        value={form.startDate}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </div>
-                  <div className="col-md-6">
-                    <FormGroup>
-                      <label>
-                        End Date <span className="text-danger">*</span>
-                      </label>
-                      <FormInput
-                        type="date"
-                        name="endDate"
-                        value={form.endDate}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </div>
-                </div>
-              </div>
-              <ModalFooter>
-                <button
-                  className="action-btn danger"
-                  onClick={() => {
-                    setShowModal(false);
-                    setForm(emptyForm);
-                  }}
-                  disabled={submitLoading}
-                >
-                  <i className="fas fa-times me-2"></i> Cancel
-                </button>
-                <button
-                  className="action-btn success"
-                  onClick={handleSave}
-                  disabled={submitLoading}
-                >
-                  {submitLoading ? (
-                    <i className="fas fa-spinner fa-spin me-2"></i>
-                  ) : (
-                    <i className="fas fa-check me-2"></i>
-                  )}
-                  {form.id > 0 ? "Update" : "Save"}
-                </button>
-              </ModalFooter>
-            </ModalContent>
-          </ModalOverlay>
-        )}
-      </PageWrapper>
+
+                    <FormRow>
+                      <FormGroup>
+                        <FormLabel>
+                          Start Date <Required>*</Required>
+                        </FormLabel>
+                        <FormInput
+                          type="date"
+                          name="startDate"
+                          value={form.startDate}
+                          onChange={handleChange}
+                          disabled={submitLoading}
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <FormLabel>
+                          End Date <Required>*</Required>
+                        </FormLabel>
+                        <FormInput
+                          type="date"
+                          name="endDate"
+                          value={form.endDate}
+                          onChange={handleChange}
+                          disabled={submitLoading}
+                        />
+                      </FormGroup>
+                    </FormRow>
+                  </ModalBody>
+
+                  <ModalFoot>
+                    <ModalBtn
+                      $variant="cancel"
+                      onClick={() => {
+                        setShowModal(false);
+                        setForm(emptyForm);
+                      }}
+                      disabled={submitLoading}
+                    >
+                      <X size={14} /> Cancel
+                    </ModalBtn>
+                    <ModalBtn
+                      $variant="save"
+                      onClick={handleSave}
+                      disabled={submitLoading}
+                    >
+                      {submitLoading ? (
+                        <RefreshCcw size={14} className="spin" />
+                      ) : (
+                        <CheckCircle2 size={14} />
+                      )}
+                      {submitLoading
+                        ? "Saving…"
+                        : form.id > 0
+                        ? "Update"
+                        : "Save"}
+                    </ModalBtn>
+                  </ModalFoot>
+                </ModalBox>
+              </Overlay>
+            )}
+          </AnimatePresence>
+
+          <style>{`
+            .swal2-container { z-index: 99999 !important; }
+            .spin { animation: _spin 1s linear infinite; }
+            @keyframes _spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+          `}</style>
+        </PageShell>
+      </PageTransition>
     </>
   );
 }
 
-/* ================= STYLED COMPONENTS ================= */
+/* ═══════════════════════════════════════════════════════════
+   KEYFRAMES & STYLED COMPONENTS (FROM SYSTEM)
+═══════════════════════════════════════════════════════════ */
+const pulse = keyframes`
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+`;
 
-const animFadeIn = keyframes`from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); }`;
-const fadeIn = keyframes`from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(8px); }`;
-const slideUpScale = keyframes`from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); }`;
+const shimmer = keyframes`
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+`;
 
-const PageWrapper = styled.div`
+const PageShell = styled.div`
   min-height: 100vh;
   color: var(--text);
-  font-family: "Inter", sans-serif;
-  .fade-slide-up {
-    opacity: 0;
-    animation: ${slideUpScale} 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-  }
-  .delay-1 {
-    animation-delay: 0.1s;
-  }
-  .delay-2 {
-    animation-delay: 0.2s;
-  }
-  .delay-3 {
-    animation-delay: 0.3s;
-  }
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--border-custom);
-    border-radius: 4px;
+  font-family: "Inter", "DM Sans", sans-serif;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  zoom: 0.8; /* STRICT SCALING REQUIREMENT */
+
+  @media (max-width: 768px) {
+    padding: 16px 12px 40px;
   }
 `;
 
+const PageHeader = styled(motion.div)`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+  background: var(--card);
+  border: 1px solid var(--border-custom);
+  border-radius: 16px;
+  padding: 18px 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+`;
+
+const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+`;
+
+const ModuleIcon = styled.div`
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+  flex-shrink: 0;
+`;
+
+const HeaderText = styled.div``;
+
+const PageTitle = styled.h1`
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+`;
+
+const Breadcrumb = styled.nav`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+`;
+
 const BreadcrumbLink = styled(Link)`
+  font-size: 12px;
   color: var(--text-muted);
   text-decoration: none;
-  transition: all 0.2s ease;
+  font-weight: 500;
   &:hover {
     color: var(--primary);
   }
 `;
 
-const HeaderSection = styled.div`
+const BreadSep = styled.span`
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.5;
+`;
+
+const BreadActive = styled.span`
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 700;
+`;
+
+const HeaderRight = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  .gradient-text {
-    background: linear-gradient(90deg, var(--primary), #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-  }
-  .btn-glow.primary {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    background: var(--primary);
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-  }
-  .btn-glow.primary:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.6);
-  }
-`;
-
-const SummaryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-`;
-
-const SummaryCard = styled.div`
-  position: relative;
-  background: var(--card);
-  border: 1px solid var(--border-custom);
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px rgba(13, 51, 236, 0.81);
-  z-index: 1;
-  backdrop-filter: blur(16px);
-  .inner-content {
-    padding: 20px;
-    background: transparent;
-    border-radius: 15px;
-  }
-  &:hover {
-    border-color: rgba(10, 102, 249, 0.87);
-    box-shadow: 3px 15px 45px rgba(59, 131, 246, 0.49);
-    transform: translateY(-5px);
-  }
-  .icon-box {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    transition: 0.3s;
-  }
-  &:hover .icon-box {
-    transform: scale(1.1) rotate(5deg);
-  }
-  h3 {
-    font-size: 1.8rem;
-  }
-`;
-
-const GlassCard = styled.div`
-  background: var(--card);
-  border: 1px solid var(--border-custom);
-  border-radius: 20px;
-  box-shadow: 0 4px 6px rgba(13, 51, 236, 0.81);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(16px);
-  &:hover {
-    border-color: rgba(10, 102, 249, 0.87);
-    box-shadow: 3px 15px 45px rgba(59, 131, 246, 0.49);
-  }
-`;
-
-const FilterCard = styled(GlassCard)`
-  padding: 18px 24px;
-  margin-bottom: 25px;
-  display: flex;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
 `;
 
-const SearchWrapper = styled.div`
-  position: relative;
-  flex: 1;
-  min-width: 250px;
-  .icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-  }
-  input {
-    width: 100%;
-    padding: 12px 12px 12px 40px;
-    background: var(--bg-light-custom);
-    border: 1px solid var(--border-custom);
-    border-radius: 14px;
-    color: var(--text);
-    font-weight: 500;
-    transition: 0.3s;
-    &:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-      outline: none;
-    }
-  }
-`;
-
-const FilterGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  .filter-input {
-    display: flex;
-    align-items: center;
-    background: var(--bg-light-custom);
-    border: 1px solid var(--border-custom);
-    border-radius: 14px;
-    padding: 0 12px;
-    height: 40px;
-    transition: 0.3s;
-    &:focus-within {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
-    }
-    select,
-    input {
-      border: none;
-      background: transparent;
-      color: var(--text);
-      font-weight: 500;
-      font-size: 13px;
-      outline: none;
-    }
-  }
-`;
-
-const QuickPill = styled.button`
+const FyChip = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border-radius: 50px;
-  border: 1px solid
-    ${(p) => (p.$active ? "transparent" : "var(--border-custom)")};
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  background: ${(p) =>
-    p.$active
-      ? "linear-gradient(135deg, var(--primary), #4f46e5)"
-      : "var(--bg-light-custom)"};
-  color: ${(p) => (p.$active ? "#fff" : "var(--text)")};
-  box-shadow: ${(p) =>
-    p.$active ? "0 4px 15px rgba(59, 130, 246, 0.4)" : "none"};
-  transition: all 0.3s;
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2);
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+
+  &.active {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #10b981;
   }
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+  &.locked {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #f59e0b;
+  }
+  &.error {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
   }
 `;
 
-const TableWrapper = styled.div`
-  overflow-x: auto;
+const LockedTag = styled.span`
+  background: #f59e0b;
+  color: white;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
 `;
-const Table = styled.table`
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  th {
-    padding: 15px;
-    text-align: left;
+
+const SyncIndicator = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--border-custom);
+  background: var(--bg-light-custom);
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: ${(p) => (p.$active ? "#f59e0b" : "#10b981")};
+    animation: ${(p) =>
+      p.$active
+        ? css`
+            ${pulse} 1s ease infinite
+          `
+        : "none"};
+  }
+  .label {
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-muted);
-    font-size: 0.8rem;
-    text-transform: uppercase;
   }
-  td {
-    background: var(--bg-hover);
-    padding: 15px;
-    vertical-align: middle;
-    transition: 0.3s;
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
+`;
+
+const HeaderBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+
+  ${(p) =>
+    p.variant === "primary" &&
+    css`
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.32);
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.42);
+      }
+    `}
+  ${(p) =>
+    p.variant === "ghost" &&
+    css`
+      background: var(--bg-light-custom);
+      color: var(--text-muted);
+      border-color: var(--border-custom);
+      &:hover:not(:disabled) {
+        color: var(--primary);
+        border-color: var(--primary);
+      }
+    `}
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
   }
-  tr.list-row {
-    transition: all 0.3s ease;
+`;
+
+const KpiGrid = styled.div`
+  display: grid;
+  grid-template-columns: ${(p) => `repeat(${p.$columns || 5}, 1fr)`};
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
   }
-  tr.list-row:hover td {
-    background: var(--bg-light-custom);
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const KpiCard = styled.div`
+  position: relative;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border-custom);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: ${(p) => p.$accent};
+    border-radius: 14px 14px 0 0;
+    opacity: 0.8;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px ${(p) => p.$accent}22;
+    border-color: ${(p) => p.$accent}44;
+  }
+`;
+
+const KpiIconWrap = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: ${(p) => p.$color}18;
+  color: ${(p) => p.$color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  ${KpiCard}:hover & {
+    transform: scale(1.12) rotate(6deg);
+  }
+`;
+
+const KpiBody = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const KpiLabel = styled.p`
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+`;
+
+const KpiValue = styled.h3`
+  margin: 4px 0 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+`;
+
+const KpiSub = styled.span`
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: var(--text-muted);
+`;
+
+const KpiGlow = styled.div`
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: ${(p) => p.$color}0d;
+  pointer-events: none;
+`;
+
+const KpiSkeleton = styled.div`
+  height: 100px;
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-light-custom) 25%,
+    var(--border-custom) 50%,
+    var(--bg-light-custom) 75%
+  );
+  background-size: 800px 100%;
+  animation: ${shimmer} 1.5s infinite linear;
+`;
+
+const TableCard = styled.div`
+  background: var(--card);
+  border: 1px solid var(--border-custom);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+`;
+
+const FilterBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-custom);
+  background: var(--bg-light-custom);
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+`;
+
+const FilterField = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1px solid var(--border-custom);
+  border-radius: 9px;
+  padding: 0 12px;
+  height: 38px;
+  transition: all 0.2s ease;
+  flex: ${(p) => (p.$grow ? p.$grow : "1")};
+  min-width: ${(p) => (p.$date ? "140px" : "160px")};
+  position: relative;
+
+  &:focus-within {
     border-color: var(--primary);
-    box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.1);
-    transform: scale(1.001);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
   }
-  .avatar-circle {
-    width: 40px;
-    height: 40px;
+
+  .fi {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .lbl {
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  input,
+  select {
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    width: 100%;
+    outline: none;
+    &::placeholder {
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: invert(0.5);
+  }
+`;
+
+const ClearBtn = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  &:hover {
+    color: #ef4444;
+  }
+`;
+
+const ResetBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 9px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.05);
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  &:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+  }
+`;
+
+const FilterBadge = styled.span`
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const DataGridWrap = styled.div`
+  overflow-x: auto;
+  &::-webkit-scrollbar {
+    height: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-custom);
+    border-radius: 10px;
+  }
+`;
+
+const DataGrid = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+`;
+
+const Th = styled.th`
+  padding: 13px 16px;
+  text-align: ${(p) => (p.center ? "center" : "left")};
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--primary);
+  background: var(--bg-light-custom);
+  border-bottom: 1px solid var(--border-custom);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+`;
+
+const DataRow = styled.tr`
+  background: var(--card);
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-custom);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:nth-child(even) {
+    background: var(--bg-light-custom);
+  }
+  &:hover {
+    background: rgba(59, 130, 246, 0.04) !important;
+    td {
+      border-color: rgba(59, 130, 246, 0.12);
+    }
+    box-shadow: inset 3px 0 0 var(--primary);
+  }
+`;
+
+const Td = styled.td`
+  padding: 14px 16px;
+  vertical-align: middle;
+  font-size: 13.5px;
+  text-align: ${(p) => (p.center ? "center" : "left")};
+  color: var(--text);
+`;
+
+const ProfileCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .fw-bolder {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  
+  .sub {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+    .icon {
+      color: var(--primary);
+      opacity: 0.8;
+    }
+  }
+`;
+
+const Avatar = styled.div`
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--primary);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  
+  ${DataRow}:hover & {
     background: var(--primary);
     color: white;
-    border-radius: 10px;
+    transform: scale(1.08) rotate(5deg);
+  }
+`;
+
+const DetailsCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+
+  span {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-weight: bold;
-  }
-  .product-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .fade-in {
-    animation: ${animFadeIn} 0.5s ease forwards;
-    opacity: 0;
+    gap: 6px;
   }
 `;
 
@@ -1147,6 +1477,8 @@ const StatusBadge = styled.span`
             : "rgba(100, 116, 139, 0.3)"};
   position: relative;
   overflow: hidden;
+  display: inline-flex;
+  
   ${(p) =>
     p.$status === "ACTIVE" &&
     css`
@@ -1173,273 +1505,344 @@ const StatusBadge = styled.span`
     `}
 `;
 
-const ActionButtons = styled.div`
+const ActionsGroup = styled.div`
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 6px;
+  
   .action-divider {
     width: 1px;
+    height: 16px;
     background: var(--border-custom);
     margin: 0 4px;
   }
-  button {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    &.edit {
-      background: rgba(14, 165, 233, 0.1);
-      color: #0ea5e9;
-    }
-    &.delete {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-    }
-    &.info {
-      background: rgba(139, 92, 246, 0.1);
-      color: #8b5cf6;
-    }
-    &.success {
-      background: rgba(16, 185, 129, 0.1);
-      color: #10b981;
-    }
-    &.danger {
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-    }
-    &.secondary {
-      background: rgba(100, 116, 139, 0.1);
-      color: #64748b;
-    }
-    &.disabled-action {
-      opacity: 0.3;
-      cursor: not-allowed;
-      background: rgba(100, 116, 139, 0.1);
-      color: #64748b;
-    }
-
-    &:hover.edit:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #0ea5e9;
-      box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
-    }
-    &:hover.delete:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #ef4444;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-    }
-    &:hover.info:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #8b5cf6;
-      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
-    }
-    &:hover.success:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #10b981;
-      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
-    }
-    &:hover.danger:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #ef4444;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-    }
-    &:hover.secondary:not(:disabled) {
-      transform: translateY(-3px);
-      border-color: #64748b;
-      box-shadow: 0 4px 10px rgba(100, 116, 139, 0.3);
-    }
-  }
 `;
 
-const PaginationWrapper = styled.div`
+const ActionBtn = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  button {
-    padding: 8px 20px;
-    border-radius: 10px;
-    border: 1px solid var(--border-custom);
-    background: var(--card);
-    color: var(--text);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: 0.3s;
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    &:hover:not(:disabled) {
-      background: var(--bg-light-custom);
-      border-color: var(--primary);
-      box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-    }
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--border-custom);
+  background: var(--bg-light-custom);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+
+  ${(p) => p.$type === "success" && css`
+    background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: transparent;
+    &:hover:not(:disabled) { background: #10b981; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+  `}
+  ${(p) => p.$type === "danger" && css`
+    background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: transparent;
+    &:hover:not(:disabled) { background: #ef4444; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+  `}
+  ${(p) => p.$type === "info" && css`
+    background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border-color: transparent;
+    &:hover:not(:disabled) { background: #8b5cf6; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); }
+  `}
+  ${(p) => p.$type === "secondary" && css`
+    background: rgba(100, 116, 139, 0.1); color: #64748b; border-color: transparent;
+    &:hover:not(:disabled) { background: #64748b; color: white; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3); }
+  `}
+  ${(p) => p.$type === "edit" && css`
+    &:hover:not(:disabled) { background: #0ea5e9; color: white; border-color: #0ea5e9; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); }
+  `}
+  ${(p) => p.$type === "delete" && css`
+    &:hover:not(:disabled) { background: #ef4444; color: white; border-color: #ef4444; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+  `}
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 `;
 
-const ModalOverlay = styled.div`
+const PaginationRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-custom);
+  background: var(--bg-light-custom);
+`;
+
+const PaginationInfo = styled.span`
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  strong {
+    color: var(--text);
+    font-weight: 700;
+  }
+`;
+
+const PaginationControls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const PageBtn = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-custom);
+  background: var(--card);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+  }
+`;
+
+const PageIndicator = styled.span`
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 6px 14px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+`;
+
+const Overlay = styled(motion.div)`
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 15, 30, 0.65);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1050;
-  animation: ${fadeIn} 0.3s ease-out forwards;
+  padding: 20px;
+
+  @media (max-width: 640px) {
+    align-items: flex-end;
+    padding: 0;
+  }
 `;
 
-const ModalContent = styled.div`
+const ModalBox = styled(motion.div)`
   background: var(--card);
   color: var(--text);
-  width: 90%;
-  max-width: 800px;
+  width: 100%;
   border-radius: 20px;
   border: 1px solid var(--border-custom);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  animation: ${slideUpScale} 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transition: 0.3s;
-  &.glowing-modal:hover {
-    box-shadow:
-      0 30px 60px -12px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(59, 130, 246, 0.1);
+  box-shadow:
+    0 32px 64px -16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(59, 130, 246, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+
+  @media (max-width: 640px) {
+    border-radius: 20px 20px 0 0;
+    max-height: 96vh;
   }
 `;
 
-const ModalHeader = styled.div`
-  padding: 20px 25px;
+const ModalHead = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border-custom);
+  gap: 14px;
+  padding: 22px 26px;
   background: var(--bg-light-custom);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  .icon-box-sm {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  border-bottom: 1px solid var(--border-custom);
+`;
+
+const ModalIconWrap = styled.div`
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: ${(p) => p.$color}18;
+  color: ${(p) => p.$color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalTitle = styled.h5`
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text);
+  flex: 1;
+`;
+
+const CloseBtn = styled.button`
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  border: 1px solid var(--border-custom);
+  background: var(--card);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: auto;
+  &:hover:not(:disabled) {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    transform: rotate(90deg);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
   }
-  .close-btn {
-    background: var(--card);
-    border: 1px solid var(--border-custom);
-    color: var(--text-muted);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.2s;
-    &:hover {
-      background: var(--danger);
-      color: white;
-      border-color: var(--danger);
-      transform: rotate(90deg);
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-    }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const ModalBody = styled.div`
+  padding: 24px 26px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-custom);
+    border-radius: 10px;
+  }
+`;
+
+const FormRow = styled.div`
+  display: grid;
+  grid-template-columns: ${(p) => `repeat(${p.$cols || 2}, 1fr)`};
+  gap: 18px;
+  
+  @media (max-width: 640px) {
+    grid-template-columns: ${(p) => p.$cols === 4 ? "1fr 1fr" : "1fr"};
   }
 `;
 
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-left: 4px;
+  gap: 7px;
+`;
+
+const FormLabel = styled.label`
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const Required = styled.span`
+  color: #ef4444;
+`;
+
+const inputStyles = css`
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-custom);
+  background: var(--bg-light-custom);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  outline: none;
+  &::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+  &:hover:not(:disabled) {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+  &:focus:not(:disabled) {
+    background: var(--card);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 `;
 
 const FormInput = styled.input`
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: var(--bg-light-custom);
-  color: var(--text) !important;
-  border: 1px solid var(--border-custom);
-  font-size: 14px;
-  transition: all 0.3s ease;
-  &::placeholder {
-    color: var(--text-muted);
-    opacity: 0.7;
-  }
-  &:hover {
-    border-color: var(--primary);
-    box-shadow: 0 0 8px rgba(59, 130, 246, 0.2);
-  }
-  &:focus {
-    background: var(--card);
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    outline: none;
-  }
+  ${inputStyles}
 `;
 
-const ModalFooter = styled.div`
-  padding: 20px 25px;
+const ModalFoot = styled.div`
+  padding: 18px 26px;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   border-top: 1px solid var(--border-custom);
   background: var(--bg-light-custom);
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  .action-btn {
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .action-btn.danger {
-    background: var(--danger);
-    color: white;
-  }
-  .action-btn.danger:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-    transform: translateY(-2px);
-  }
-  .action-btn.success {
-    background: var(--success);
-    color: white;
-  }
-  .action-btn.success:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
-    transform: translateY(-2px);
-  }
-  .action-btn.secondary {
-    background: var(--card);
-    border: 1px solid var(--border-custom);
-    color: var(--text);
-  }
-  .action-btn.secondary:hover:not(:disabled) {
-    background: var(--bg-hover);
-    border-color: var(--primary);
-  }
-  .action-btn:disabled {
-    opacity: 0.6;
+`;
+
+const ModalBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+
+  ${(p) =>
+    p.$variant === "save" &&
+    css`
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+      &:hover:not(:disabled) {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+      }
+    `}
+  ${(p) =>
+    p.$variant === "cancel" &&
+    css`
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border-custom);
+      &:hover:not(:disabled) {
+        background: rgba(239, 68, 68, 0.06);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+    `}
+  &:disabled {
+    opacity: 0.55;
     cursor: not-allowed;
-  }
-  .btn-sm {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 8px;
+    transform: none !important;
   }
 `;
